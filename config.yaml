@@ -1,0 +1,22 @@
+server:
+  name: "media-storage"
+  port: ":8003"
+  base_path: "/api/v1"
+  test_mode: true
+  logging:
+    level: "debug"
+    format: "text"
+
+jwt:
+  access_token:
+    secret_key: "supersecretkey"
+    token_lifetime: 900
+
+kafka:
+  brokers:
+    - "re-news-kafka:9092"
+
+swagger:
+  enabled: true
+  url: "/swagger"
+  port: "8080"
