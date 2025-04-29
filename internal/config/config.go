@@ -41,6 +41,13 @@ type KafkaConfig struct {
 	RequiredAcks string        `mapstructure:"required_acks"`
 }
 
+type AwsConfig struct {
+	Region      string `mapstructure:"region"`
+	BucketName  string `mapstructure:"bucket_name"`
+	AccessKeyID string `mapstructure:"access_key_id"`
+	AccessKey   string `mapstructure:"access_key"`
+}
+
 type SwaggerConfig struct {
 	Enabled bool   `mapstructure:"enabled"`
 	URL     string `mapstructure:"url"`

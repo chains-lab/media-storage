@@ -12,6 +12,12 @@ jwt:
     secret_key: "supersecretkey"
     token_lifetime: 900
 
+aws:
+  region: "eu-central-1"
+  access_key_id: "your_access_key_id"
+  secret_access_key: "your_secret_access_key"
+  bucket_name: "your_bucket_name"
+
 kafka:
   brokers:
     - "re-news-kafka:9092"
