@@ -1,0 +1,14 @@
+type: object
+required:
+  - id
+  - type
+  - attributes
+properties:
+  id:
+    type: string
+    description: "file name"
+  type:
+    type: string
+    enum: [ media ]
+  attributes:
+    $ref: './MediaAttributes.yaml'
