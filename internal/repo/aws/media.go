@@ -10,12 +10,13 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
-// ContentModel описывает метаданные объекта в S3
-type ContentModel struct {
+// MediaModel описывает метаданные объекта в S3
+type MediaModel struct {
 	Filename string
 	Folder   string // имя или относительный путь файла в бакете
 	Ext      string
@@ -30,11 +31,17 @@ type S3Client struct {
 	region string
 }
 
-func NewS3Client(bucket, region string) (*S3Client, error) {
-	cfg, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithRegion(region))
+func NewAwsS3Client(bucket, region, accessKeyID, secretAccessKey string) (*S3Client, error) {
+	// Создаём провайдер, который отдаёт именно эти ключи
+	staticProvider := credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")
+	cfg, err := awscfg.LoadDefaultConfig(context.TODO(),
+		awscfg.WithRegion(region),
+		awscfg.WithCredentialsProvider(staticProvider),
+	)
 	if err != nil {
-		return nil, fmt.Errorf("loading AWS config: %w", err)
+		return nil, fmt.Errorf("unable to load AWS SDK config: %w", err)
 	}
+
 	client := s3.NewFromConfig(cfg)
 	return &S3Client{
 		client: client,
@@ -44,19 +51,17 @@ func NewS3Client(bucket, region string) (*S3Client, error) {
 }
 
 type AddFileInput struct {
-	Reader      io.Reader
-	ContentType string
+	Reader io.Reader
 }
 
 // AddFile загружает файл в указанную папку (folder) с именем filename и возвращает публичный URL
-func (s *S3Client) AddFile(ctx context.Context, folder, filename, ext string, input AddFileInput) (ContentModel, error) {
+func (s *S3Client) AddFile(ctx context.Context, folder, filename, ext string, input AddFileInput) (MediaModel, error) {
 	key := path.Join(folder, filename+ext)
 
 	ct := mime.TypeByExtension(ext)
 	if ct == "" {
-		return ContentModel{}, fmt.Errorf("unsupported file extension: %s", ext)
+		return MediaModel{}, fmt.Errorf("unsupported file extension: %s", ext)
 	}
-
 	_, err := s.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(s.bucket),
 		Key:         aws.String(key),
@@ -65,7 +70,7 @@ func (s *S3Client) AddFile(ctx context.Context, folder, filename, ext string, in
 	})
 
 	if err != nil {
-		return ContentModel{}, fmt.Errorf("put S3 object %s: %w", key, err)
+		return MediaModel{}, fmt.Errorf("put S3 object %s: %w", key, err)
 	}
 
 	head, err := s.client.HeadObject(ctx, &s3.HeadObjectInput{
@@ -73,12 +78,12 @@ func (s *S3Client) AddFile(ctx context.Context, folder, filename, ext string, in
 		Key:    aws.String(key),
 	})
 	if err != nil {
-		return ContentModel{}, fmt.Errorf("head S3 object %s: %w", key, err)
+		return MediaModel{}, fmt.Errorf("head S3 object %s: %w", key, err)
 	}
 
 	size := aws.ToInt64(head.ContentLength)
 	url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", s.bucket, s.region, key)
-	return ContentModel{
+	return MediaModel{
 		Filename: filename,
 		Folder:   folder,
 		URL:      url,
@@ -86,8 +91,8 @@ func (s *S3Client) AddFile(ctx context.Context, folder, filename, ext string, in
 	}, nil
 }
 
-func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit uint) ([]ContentModel, error) {
-	var results []ContentModel
+func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit uint) ([]MediaModel, error) {
+	var results []MediaModel
 	input := &s3.ListObjectsV2Input{
 		Bucket: aws.String(s.bucket),
 		Prefix: aws.String(folder + "/"),
@@ -121,7 +126,7 @@ func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit u
 			}
 
 			url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", s.bucket, s.region, key)
-			results = append(results, ContentModel{
+			results = append(results, MediaModel{
 				Filename: filename,
 				Folder:   folder,
 				URL:      url,
@@ -132,8 +137,8 @@ func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit u
 	return results, nil
 }
 
-func (s *S3Client) DeleteFile(ctx context.Context, pathTo, filename, ext string) error {
-	name := path.Join(pathTo, filename+ext)
+func (s *S3Client) DeleteFile(ctx context.Context, folder, filename, ext string) error {
+	name := path.Join(folder, filename+ext)
 	_, err := s.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(name),
@@ -145,10 +150,10 @@ func (s *S3Client) DeleteFile(ctx context.Context, pathTo, filename, ext string)
 }
 
 // DeleteFilesInFolder удаляет только непосредственные файлы (не папки) в указанном folder
-func (s *S3Client) DeleteFilesInFolder(ctx context.Context, pathTo string) error {
+func (s *S3Client) DeleteFilesInFolder(ctx context.Context, folder string) error {
 	input := &s3.ListObjectsV2Input{
 		Bucket:    aws.String(s.bucket),
-		Prefix:    aws.String(pathTo + "/"),
+		Prefix:    aws.String(folder + "/"),
 		Delimiter: aws.String("/"),
 	}
 	page, err := s.client.ListObjectsV2(ctx, input)
@@ -168,7 +173,7 @@ func (s *S3Client) DeleteFilesInFolder(ctx context.Context, pathTo string) error
 		Delete: &s3types.Delete{Objects: toDelete, Quiet: aws.Bool(true)},
 	})
 	if err != nil {
-		return fmt.Errorf("batch delete objects in %s: %w", pathTo, err)
+		return fmt.Errorf("batch delete objects in %s: %w", folder, err)
 	}
 	return nil
 }

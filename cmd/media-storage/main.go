@@ -1,4 +1,4 @@
-package media_storage
+package main
 
 import (
 	"os"

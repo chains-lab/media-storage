@@ -1,0 +1,121 @@
+openapi: 3.1.0
+info:
+  title: Title
+  description: Title
+  version: 1.0.0
+paths:
+  /test:
+    post:
+      tags:
+        - Test
+      description: Test
+      responses:
+        '201':
+          description: successfully
+components:
+  schemas:
+    Media:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/MediaData'
+    MediaData:
+      type: object
+      required:
+        - id
+        - type
+        - attributes
+      properties:
+        id:
+          type: string
+          description: file name
+        type:
+          type: string
+          enum:
+            - media
+        attributes:
+          $ref: '#/components/schemas/MediaAttributes'
+    MediaAttributes:
+      type: object
+      required:
+        - format
+        - size
+        - url
+        - created_at
+      properties:
+        format:
+          type: string
+          description: file format
+        size:
+          type: integer
+          format: int64
+          description: file size in bytes
+        url:
+          type: string
+          format: uri
+          description: media URL
+        created_at:
+          type: string
+          format: date-time
+          description: media creation date and time
+    MediaCollection:
+      type: object
+      required:
+        - data
+        - links
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - attributes
+          properties:
+            type:
+              type: string
+              enum:
+                - media_collection
+            attributes:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MediaData'
+    UploadMedia:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - type
+            - attributes
+          properties:
+            type:
+              type: string
+              enum:
+                - media_upload
+            attributes:
+              type: object
+              required:
+                - resource_type
+                - resource_id
+                - media_type
+              properties:
+                resource_type:
+                  type: string
+                  description: resource type
+                resource_id:
+                  type: string
+                  description: resource id
+                media_type:
+                  type: string
+                  description: content type
+                owner_id:
+                  type: string
+                  description: owner id

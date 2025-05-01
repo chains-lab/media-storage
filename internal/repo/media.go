@@ -19,21 +19,21 @@ const (
 )
 
 type MediaModel struct {
-	ID              uuid.UUID          `db:"id"`
-	Folder          string             `db:"folder"`
-	Ext             string             `db:"extension"`
-	ResourceType    enums.ResourceType `db:"resource_type"`
-	ResourceID      uuid.UUID          `db:"resource_id"`
-	ContentType     enums.ContentType  `db:"content_type"`
-	OwnerID         *uuid.UUID         `db:"owner_id,omitempty"`
-	Public          bool               `db:"public"`
-	AdminOnlyUpdate bool               `db:"admin_only_update"`
-	CreatedAt       time.Time          `db:"created_at"`
+	ID           uuid.UUID          `db:"id"`
+	Folder       string             `db:"folder"`
+	Ext          string             `db:"extension"`
+	Size         int64              `db:"size"`
+	URL          string             `db:"url"`
+	ResourceType enums.ResourceType `db:"resource_type"`
+	ResourceID   uuid.UUID          `db:"resource_id"`
+	MediaType    enums.MediaType    `db:"media_type"`
+	OwnerID      *uuid.UUID         `db:"owner_id,omitempty"`
+	CreatedAt    time.Time          `db:"created_at"`
 }
 
 type mediaAws interface {
-	AddFile(ctx context.Context, folder, filename, ext string, input aws.AddFileInput) (aws.ContentModel, error)
-	ListFiles(ctx context.Context, folder string, offset, limit uint) ([]aws.ContentModel, error)
+	AddFile(ctx context.Context, folder, filename, ext string, input aws.AddFileInput) (aws.MediaModel, error)
+	ListFiles(ctx context.Context, folder string, offset, limit uint) ([]aws.MediaModel, error)
 	DeleteFile(ctx context.Context, folder, filename, ext string) error
 	DeleteFilesInFolder(ctx context.Context, folder string) error
 }
@@ -60,7 +60,7 @@ type MediaRepo struct {
 }
 
 func NewMedia(cfg config.Config) (MediaRepo, error) {
-	s3, err := aws.NewS3Client(cfg.Aws.BucketName, cfg.Aws.Region)
+	s3, err := aws.NewAwsS3Client(cfg.Aws.BucketName, cfg.Aws.Region, cfg.Aws.AccessKeyID, cfg.Aws.AccessKey)
 	if err != nil {
 		return MediaRepo{}, err
 	}
@@ -76,43 +76,41 @@ func NewMedia(cfg config.Config) (MediaRepo, error) {
 	}, nil
 }
 
-type AddContentInput struct {
-	Reader          io.Reader
-	ResourceType    enums.ResourceType
-	ResourceID      uuid.UUID
-	ContentType     enums.ContentType
-	OwnerID         *uuid.UUID
-	Public          bool
-	AdminOnlyUpdate bool
-	CreatedAt       time.Time
+type AddMediaInput struct {
+	Folder       string
+	Filename     uuid.UUID
+	Ext          string
+	ResourceType enums.ResourceType
+	ResourceID   uuid.UUID
+	MediaType    enums.MediaType
+	OwnerID      *uuid.UUID
+	CreatedAt    time.Time
 }
 
-func (r MediaRepo) AddMedia(ctx context.Context, folder string, filename uuid.UUID, ext string, input AddContentInput) (MediaModel, error) {
+func (r MediaRepo) AddMedia(ctx context.Context, reader io.Reader, input AddMediaInput) (MediaModel, error) {
 	awsInput := aws.AddFileInput{
-		Reader: input.Reader,
+		Reader: reader,
 	}
 
-	resAsw, err := r.s3.AddFile(ctx, folder, filename.String(), ext, awsInput)
+	resAsw, err := r.s3.AddFile(ctx, input.Folder, input.Filename.String(), input.Ext, awsInput)
 	if err != nil {
 		return MediaModel{}, fmt.Errorf("s3 upload failed: %w", err)
 	}
 
-	inserted := sqldb.MediaInsertInput{
-		ID:              filename,
-		Folder:          folder,
-		Ext:             ext,
-		ResourceType:    input.ResourceType,
-		ResourceID:      input.ResourceID,
-		ContentType:     input.ContentType,
-		Public:          input.Public,
-		AdminOnlyUpdate: input.AdminOnlyUpdate,
-		CreatedAt:       input.CreatedAt,
+	sqlInput := sqldb.MediaInsertInput{
+		ID:           input.Filename,
+		Folder:       input.Folder,
+		Ext:          input.Ext,
+		ResourceType: input.ResourceType,
+		ResourceID:   input.ResourceID,
+		MediaType:    input.MediaType,
+		CreatedAt:    input.CreatedAt,
 	}
 	if input.OwnerID != nil {
-		inserted.OwnerID = input.OwnerID
+		sqlInput.OwnerID = input.OwnerID
 	}
 
-	resSql, err := r.sql.Insert(ctx, inserted)
+	resSql, err := r.sql.Insert(ctx, sqlInput)
 	if err != nil {
 		return MediaModel{}, fmt.Errorf("sql insert failed: %w", err)
 	}
@@ -139,13 +137,13 @@ func (r MediaRepo) ListMedia(ctx context.Context, folder string, limit, offset u
 	return results, nil
 }
 
-func (r MediaRepo) DeleteMedia(ctx context.Context, folder string, id uuid.UUID, ext string) error {
-	err := r.s3.DeleteFile(ctx, folder, id.String(), ext)
+func (r MediaRepo) DeleteMedia(ctx context.Context, folder string, fileId uuid.UUID, ext string) error {
+	err := r.s3.DeleteFile(ctx, folder, fileId.String(), ext)
 	if err != nil {
 		return fmt.Errorf("s3 delete: %w", err)
 	}
 
-	err = r.sql.New().FilterFolder(folder).FilterID(id).Delete(ctx)
+	err = r.sql.New().FilterFolder(folder).FilterID(fileId).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("sql delete: %w", err)
 	}
@@ -166,17 +164,17 @@ func (r MediaRepo) DeleteFromFolder(ctx context.Context, folder string) error {
 	return nil
 }
 
-func createMediaModel(sql sqldb.MediaModel, aws aws.ContentModel) MediaModel {
+func createMediaModel(sql sqldb.MediaModel, aws aws.MediaModel) MediaModel {
 	res := MediaModel{
-		ID:              sql.ID,
-		Folder:          sql.Folder,
-		Ext:             sql.Ext,
-		ResourceType:    sql.ResourceType,
-		ResourceID:      sql.ResourceID,
-		ContentType:     sql.ContentType,
-		Public:          sql.Public,
-		AdminOnlyUpdate: sql.AdminOnlyUpdate,
-		CreatedAt:       sql.CreatedAt,
+		ID:           sql.ID,
+		Folder:       sql.Folder,
+		Ext:          sql.Ext,
+		Size:         aws.Size,
+		URL:          aws.URL,
+		ResourceType: sql.ResourceType,
+		ResourceID:   sql.ResourceID,
+		MediaType:    sql.MediaType,
+		CreatedAt:    sql.CreatedAt,
 	}
 
 	if sql.OwnerID != nil {

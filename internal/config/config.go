@@ -54,12 +54,27 @@ type SwaggerConfig struct {
 	Port    string `mapstructure:"port"`
 }
 
+type DatabaseConfig struct {
+	SQL struct {
+		URL string `mapstructure:"url"`
+	} `mapstructure:"sql"`
+
+	Redis struct {
+		Addr     string `mapstructure:"addr"`
+		Password string `mapstructure:"password"`
+		DB       int    `mapstructure:"db"`
+		Lifetime int    `mapstructure:"lifetime"`
+	} `mapstructure:"redis"`
+}
+
 type Config struct {
-	Server  ServerConfig  `mapstructure:"server"`
-	JWT     JWTConfig     `mapstructure:"jwt"`
-	Kafka   KafkaConfig   `mapstructure:"kafka"`
-	Swagger SwaggerConfig `mapstructure:"swagger"`
-	Log     *logrus.Logger
+	Server   ServerConfig   `mapstructure:"server"`
+	JWT      JWTConfig      `mapstructure:"jwt"`
+	Kafka    KafkaConfig    `mapstructure:"kafka"`
+	Aws      AwsConfig      `mapstructure:"aws"`
+	Database DatabaseConfig `mapstructure:"database"`
+	Swagger  SwaggerConfig  `mapstructure:"swagger"`
+	Log      *logrus.Logger
 }
 
 func LoadConfig() (Config, error) {

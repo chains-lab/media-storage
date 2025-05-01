@@ -44,12 +44,14 @@ func NewAPI(cfg config.Config, log *logrus.Logger, app *app.App) Api {
 }
 
 func (a *Api) Run(ctx context.Context, log *logrus.Logger) {
-	_ = tokens.AuthMdl(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey)
+	auth := tokens.AuthMdl(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey)
 	_ = tokens.AccessGrant(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey, roles.Admin, roles.SuperUser)
 
-	a.router.Route("/hs/media-storage", func(r chi.Router) {
+	a.router.Route("/hs-news/media-storage", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
-
+			r.Route("/media", func(r chi.Router) {
+				r.With(auth).Post("/", a.handlers.UploadMedia)
+			})
 		})
 	})
 

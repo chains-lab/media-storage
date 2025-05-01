@@ -23,13 +23,13 @@ type MediaModel struct {
 	//ID of resource
 	ResourceID uuid.UUID `db:"resource_id"`
 
-	//ContentType of resource
-	ContentType enums.ContentType `db:"content_type"`
+	//MediaType of resource
+	MediaType enums.MediaType `db:"media_type"`
 
 	//Owner ID of resource who
-	OwnerID         *uuid.UUID `db:"owner_id,omitempty"`
-	Public          bool       `db:"public"`
-	AdminOnlyUpdate bool       `db:"admin_only_update"`
+	OwnerID *uuid.UUID `db:"owner_id,omitempty"`
+	//Public          bool       `db:"public"`
+	//AdminOnlyUpdate bool       `db:"admin_only_update"`
 
 	CreatedAt time.Time `db:"created_at"`
 }
@@ -66,33 +66,33 @@ type MediaInsertInput struct {
 	ResourceType enums.ResourceType `db:"resource_type"`
 	ResourceID   uuid.UUID          `db:"resource_id"`
 
-	ContentType enums.ContentType `db:"content_type"`
+	MediaType enums.MediaType `db:"media_type"`
 
-	OwnerID         *uuid.UUID `db:"owner_id,omitempty"`
-	Public          bool       `db:"public"`
-	AdminOnlyUpdate bool       `db:"admin_only_update"`
+	OwnerID *uuid.UUID `db:"owner_id,omitempty"`
+	//Public          bool       `db:"public"`
+	//AdminOnlyUpdate bool       `db:"admin_only_update"`
 
 	CreatedAt time.Time `db:"created_at"`
 }
 
 func (q MediaQ) Insert(ctx context.Context, input MediaInsertInput) (MediaModel, error) {
-	values := map[string]interface{}{
-		"id":                input.ID,
-		"folder":            input.Folder,
-		"extension":         input.Ext,
-		"resource_type":     input.ResourceType,
-		"resource_id":       input.ResourceID,
-		"content_type":      input.ContentType,
-		"public":            input.Public,
-		"admin_only_update": input.AdminOnlyUpdate,
-		"created_at":        input.CreatedAt,
+	values := map[string]any{
+		"id":            input.ID,
+		"folder":        input.Folder,
+		"extension":     input.Ext,
+		"resource_type": input.ResourceType,
+		"resource_id":   input.ResourceID,
+		"media_type":    input.MediaType,
+		"created_at":    input.CreatedAt,
 	}
 
 	if input.OwnerID != nil {
-		values["owner_id"] = input.OwnerID
+		values["owner_id"] = *input.OwnerID
+	} else {
+		values["owner_id"] = nil
 	}
 
-	query, args, err := q.inserter.Values(values).ToSql()
+	query, args, err := q.inserter.SetMap(values).ToSql()
 	if err != nil {
 		return MediaModel{}, err
 	}
@@ -104,15 +104,13 @@ func (q MediaQ) Insert(ctx context.Context, input MediaInsertInput) (MediaModel,
 	}
 
 	res := MediaModel{
-		ID:              input.ID,
-		Folder:          input.Folder,
-		Ext:             input.Ext,
-		ResourceType:    input.ResourceType,
-		ResourceID:      input.ResourceID,
-		ContentType:     input.ContentType,
-		Public:          input.Public,
-		AdminOnlyUpdate: input.AdminOnlyUpdate,
-		CreatedAt:       input.CreatedAt,
+		ID:           input.ID,
+		Folder:       input.Folder,
+		Ext:          input.Ext,
+		ResourceType: input.ResourceType,
+		ResourceID:   input.ResourceID,
+		MediaType:    input.MediaType,
+		CreatedAt:    input.CreatedAt,
 	}
 
 	if input.OwnerID != nil {
@@ -161,10 +159,8 @@ func (q MediaQ) Select(ctx context.Context) ([]MediaModel, error) {
 			&m.Ext,
 			&m.ResourceType,
 			&m.ResourceID,
-			&m.ContentType,
+			&m.MediaType,
 			&m.OwnerID,
-			&m.Public,
-			&m.AdminOnlyUpdate,
 			&m.CreatedAt,
 		)
 		if err != nil {
@@ -189,10 +185,8 @@ func (q MediaQ) Get(ctx context.Context) (MediaModel, error) {
 		&m.Ext,
 		&m.ResourceType,
 		&m.ResourceID,
-		&m.ContentType,
+		&m.MediaType,
 		&m.OwnerID,
-		&m.Public,
-		&m.AdminOnlyUpdate,
 		&m.CreatedAt,
 	)
 	if err != nil {

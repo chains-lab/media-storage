@@ -1,7 +1,6 @@
 type: object
 required:
   - data
-  - included
 properties:
   data:
     $ref: './MediaData.yaml'

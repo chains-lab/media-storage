@@ -1,3 +1,7 @@
 package resources
 
-const ()
+const (
+	MediaType = "media"
+
+	MediaUploadType = "upload_media"
+)

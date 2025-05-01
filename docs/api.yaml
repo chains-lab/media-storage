@@ -24,3 +24,5 @@ components:
       $ref: './spec/components/schemas/MediaAttributes.yaml'
     MediaCollection:
       $ref: './spec/components/schemas/MediaCollection.yaml'
+    UploadMedia:
+      $ref: './spec/components/schemas/UploadMedia.yaml'

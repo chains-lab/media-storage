@@ -1,0 +1,122 @@
+openapi: 3.1.0
+info:
+  description: Title
+  title: Title
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /test:
+    post:
+      description: Test
+      responses:
+        "201":
+          description: successfully
+      tags:
+      - Test
+components:
+  schemas:
+    Media:
+      properties:
+        data:
+          $ref: '#/components/schemas/MediaData'
+      required:
+      - data
+    MediaData:
+      properties:
+        id:
+          description: file name
+          type: string
+        type:
+          enum:
+          - media
+          type: string
+        attributes:
+          $ref: '#/components/schemas/MediaAttributes'
+      required:
+      - attributes
+      - id
+      - type
+    MediaAttributes:
+      properties:
+        format:
+          description: file format
+          type: string
+        size:
+          description: file size in bytes
+          format: int64
+          type: integer
+        url:
+          description: media URL
+          format: uri
+          type: string
+        created_at:
+          description: media creation date and time
+          format: date-time
+          type: string
+      required:
+      - created_at
+      - format
+      - size
+      - url
+    MediaCollection:
+      properties:
+        data:
+          $ref: '#/components/schemas/MediaCollection_data'
+      required:
+      - data
+      - links
+    UploadMedia:
+      properties:
+        data:
+          $ref: '#/components/schemas/UploadMedia_data'
+      required:
+      - data
+    MediaCollection_data_attributes:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/MediaData'
+          type: array
+      required:
+      - data
+    MediaCollection_data:
+      properties:
+        type:
+          enum:
+          - media_collection
+          type: string
+        attributes:
+          $ref: '#/components/schemas/MediaCollection_data_attributes'
+      required:
+      - attributes
+      - type
+    UploadMedia_data_attributes:
+      properties:
+        resource_type:
+          description: resource type
+          type: string
+        resource_id:
+          description: resource id
+          type: string
+        media_type:
+          description: content type
+          type: string
+        owner_id:
+          description: owner id
+          type: string
+      required:
+      - media_type
+      - resource_id
+      - resource_type
+    UploadMedia_data:
+      properties:
+        type:
+          enum:
+          - media_upload
+          type: string
+        attributes:
+          $ref: '#/components/schemas/UploadMedia_data_attributes'
+      required:
+      - attributes
+      - type

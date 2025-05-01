@@ -1,0 +1,32 @@
+type: object
+required:
+  - data
+properties:
+  data:
+    type: object
+    required:
+      - type
+      - attributes
+    properties:
+      type:
+        type: string
+        enum: [ upload_media ]
+      attributes:
+        type: object
+        required:
+          - resource_type
+          - resource_id
+          - media_type
+        properties:
+          resource_type:
+            type: string
+            description: "resource type"
+          resource_id:
+            type: string
+            description: "resource id"
+          media_type:
+            type: string
+            description: "content type"
+          owner_id:
+            type: string
+            description: "owner id"

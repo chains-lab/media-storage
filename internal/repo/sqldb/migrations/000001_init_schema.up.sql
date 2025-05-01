@@ -6,9 +6,7 @@ CREATE TABLE media (
     extension TEXT NOT NULL,
     resource_type TEXT NOT NULL,
     resource_id UUID NOT NULL,
-    content_type TEXT NOT NULL,
+    media_type TEXT NOT NULL,
     owner_id UUID,
-    public BOOLEAN NOT NULL,,
-    admin_only_update BOOLEAN NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    created_at TIMESTAMP NOT NULL DEFAULT now()
 );

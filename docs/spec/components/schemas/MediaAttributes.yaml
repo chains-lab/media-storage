@@ -3,35 +3,20 @@ required:
   - format
   - size
   - url
+  - created_at
 properties:
   format:
     type: string
     description: "file format"
   size:
     type: integer
+    format: int64
     description: "file size in bytes"
   url:
     type: string
     format: uri
     description: "media URL"
-
-  width:
-    type: integer
-    description: "image width in pixels"
-  height:
-    type: integer
-    description: "image height in pixels"
-
-  duration:
-    type: integer
-    description: "video duration in seconds"
-
-  fps:
-    type: integer
-    description: "video frames per second"
-  resolution:
+  created_at:
     type: string
-    description: "video resolution"
-  bitrate:
-    type: integer
-    description: "video bitrate in kbps"
+    format: date-time
+    description: "media creation date and time"
