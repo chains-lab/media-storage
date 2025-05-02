@@ -35,9 +35,8 @@ type mediaAws interface {
 	AddFile(ctx context.Context, data aws.FileData, reader io.Reader) (aws.MediaModel, error)
 	GetFile(ctx context.Context, data aws.FileData) (aws.MediaModel, error)
 	DeleteFile(ctx context.Context, data aws.FileData) error
-	DeleteFilesInFolder(ctx context.Context, folder string) error
-
 	ListFiles(ctx context.Context, folder string, offset, limit uint) ([]aws.MediaModel, error)
+	DeleteFilesByPrefix(ctx context.Context, prefix string) error
 }
 
 type mediaSQL interface {
@@ -159,40 +158,6 @@ func (r MediaRepo) DeleteMedia(ctx context.Context, fileId uuid.UUID) error {
 	return nil
 }
 
-//TODO
-
-func (r MediaRepo) ListMedia(ctx context.Context, folder string, limit, offset uint) ([]MediaModel, error) {
-	sqlList, err := r.sql.New().Page(limit, offset).FilterFolder(folder).Select(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("sql select: %w", err)
-	}
-
-	s3List, err := r.s3.ListFiles(ctx, folder, offset, limit)
-	if err != nil {
-		return nil, fmt.Errorf("s3 list: %w", err)
-	}
-
-	results := make([]MediaModel, 0, len(sqlList))
-	for i := range sqlList {
-		results = append(results, createMediaModel(sqlList[i], s3List[i]))
-
-	}
-	return results, nil
-}
-
-func (r MediaRepo) DeleteFromFolder(ctx context.Context, folder string) error {
-	err := r.s3.DeleteFilesInFolder(ctx, folder)
-	if err != nil {
-		return fmt.Errorf("s3 batch delete: %w", err)
-	}
-
-	err = r.sql.New().FilterFolder(folder).Delete(ctx)
-	if err != nil {
-		return fmt.Errorf("sql delete folder: %w", err)
-	}
-	return nil
-}
-
 func createMediaModel(sql sqldb.MediaModel, aws aws.MediaModel) MediaModel {
 	res := MediaModel{
 		ID:           sql.Filename,
@@ -208,4 +173,18 @@ func createMediaModel(sql sqldb.MediaModel, aws aws.MediaModel) MediaModel {
 	}
 
 	return res
+}
+
+func (r MediaRepo) DeleteFilesByPrefix(ctx context.Context, prefix string) error {
+	err := r.s3.DeleteFilesByPrefix(ctx, prefix)
+	if err != nil {
+		return fmt.Errorf("s3 delete by prefix: %w", err)
+	}
+
+	err = r.sql.New().FilterFolder(prefix).Delete(ctx)
+	if err != nil {
+		return fmt.Errorf("sql delete by prefix: %w", err)
+	}
+
+	return nil
 }

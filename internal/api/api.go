@@ -50,21 +50,21 @@ func (a *Api) Run(ctx context.Context, log *logrus.Logger) {
 	a.router.Route("/hs-news/media-storage", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/media", func(r chi.Router) {
-				r.Route("/{resource_id}", func(r chi.Router) {
+				r.Route("/{media_resource_type}", func(r chi.Router) {
 					r.With(auth).Post("/", a.handlers.UploadMedia)
 					r.With(auth).Delete("/", a.handlers.DeleteMedia)
 					r.Get("/", a.handlers.GetMedia)
 				})
 			})
 
-			//r.Route("/media-rules", func(r chi.Router) {
-			//	r.With(auth).Post("/", a.handlers.CreateMediaRules)
-			//	r.Route("/{resource_type}", func(r chi.Router) {
-			//		r.With(auth).Put("/", a.handlers.UpdateMediaRules)
-			//		r.With(auth).Delete("/", a.handlers.DeleteMediaRules)
-			//		r.Get("/", a.handlers.GetMediaRules)
-			//	})
-			//})
+			r.Route("/media-rules", func(r chi.Router) {
+				r.With(auth).Post("/", a.handlers.CreateMediaRules)
+				r.Route("/{media_resource_type}", func(r chi.Router) {
+					r.With(auth).Put("/", a.handlers.UpdateMediaRules)
+					r.With(auth).Delete("/", a.handlers.DeleteMediaRules)
+					r.Get("/", a.handlers.GetMediaRules)
+				})
+			})
 		})
 	})
 

@@ -5,7 +5,7 @@ import (
 	"github.com/hs-zavet/media-storage/resources"
 )
 
-func UploadMedia(media models.Media) resources.Media {
+func Media(media models.Media) resources.Media {
 	attributes := resources.MediaAttributes{
 		Format:    media.Ext,
 		Size:      media.Size,

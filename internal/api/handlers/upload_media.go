@@ -27,7 +27,7 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	req, file, fileHeader, err := requests.UploadMedia(r)
 	if err != nil {
-		h.log.WithError(err).Warn("error parsing request1")
+		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -36,7 +36,7 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"resource_type": validation.NewError("resource_type", "invalid resource type"),
+			"media_resource_type": validation.NewError("media_resource_type", "invalid resource type"),
 		})...)
 		return
 	}
@@ -96,5 +96,5 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	h.log.Infof("Media %s successfully uploaded by user: %s", res.ID, user.AccountID)
 
-	httpkit.Render(w, responses.UploadMedia(res))
+	httpkit.Render(w, responses.Media(res))
 }

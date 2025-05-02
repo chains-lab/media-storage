@@ -21,7 +21,7 @@ var _ MappedNullable = &MediaCollectionDataAttributes{}
 
 // MediaCollectionDataAttributes struct for MediaCollectionDataAttributes
 type MediaCollectionDataAttributes struct {
-	Data []MediaData `json:"data"`
+	Data []MediaRulesData `json:"data"`
 }
 
 type _MediaCollectionDataAttributes MediaCollectionDataAttributes
@@ -30,7 +30,7 @@ type _MediaCollectionDataAttributes MediaCollectionDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewMediaCollectionDataAttributes(data []MediaData) *MediaCollectionDataAttributes {
+func NewMediaCollectionDataAttributes(data []MediaRulesData) *MediaCollectionDataAttributes {
 	this := MediaCollectionDataAttributes{}
 	this.Data = data
 	return &this
@@ -45,9 +45,9 @@ func NewMediaCollectionDataAttributesWithDefaults() *MediaCollectionDataAttribut
 }
 
 // GetData returns the Data field value
-func (o *MediaCollectionDataAttributes) GetData() []MediaData {
+func (o *MediaCollectionDataAttributes) GetData() []MediaRulesData {
 	if o == nil {
-		var ret []MediaData
+		var ret []MediaRulesData
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *MediaCollectionDataAttributes) GetData() []MediaData {
 
 // GetDataOk returns a tuple with the Data field value
 // and a boolean to check if the value has been set.
-func (o *MediaCollectionDataAttributes) GetDataOk() ([]MediaData, bool) {
+func (o *MediaCollectionDataAttributes) GetDataOk() ([]MediaRulesData, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,7 +64,7 @@ func (o *MediaCollectionDataAttributes) GetDataOk() ([]MediaData, bool) {
 }
 
 // SetData sets field value
-func (o *MediaCollectionDataAttributes) SetData(v []MediaData) {
+func (o *MediaCollectionDataAttributes) SetData(v []MediaRulesData) {
 	o.Data = v
 }
 

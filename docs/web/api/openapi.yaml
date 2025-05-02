@@ -72,11 +72,81 @@ components:
           $ref: '#/components/schemas/UploadMedia_data'
       required:
       - data
+    MediaRules:
+      properties:
+        data:
+          $ref: '#/components/schemas/MediaRulesData'
+      required:
+      - data
+    MediaRulesData:
+      properties:
+        id:
+          description: media type
+          type: string
+        type:
+          enum:
+          - media_rules
+          type: string
+        attributes:
+          $ref: '#/components/schemas/MediaRulesAttributes'
+      required:
+      - attributes
+      - id
+      - type
+    MediaRulesAttributes:
+      properties:
+        max_size:
+          description: Maximum file size in bytes
+          format: int64
+          type: integer
+        allowed_exits:
+          items:
+            description: Allowed exits for the media
+            example:
+            - .jpg
+            - .png
+            type: string
+          type: array
+        folder:
+          description: Folder where the media is stored
+          type: string
+        roles:
+          items:
+            description: Roles that can access the media
+            enum:
+            - admin
+            - user
+            type: string
+          type: array
+      required:
+      - allowed_exits
+      - folder
+      - max_size
+      - roles
+    CreateMediaRules:
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateMediaRules_data'
+      required:
+      - data
+    UpdateMediaRules:
+      properties:
+        data:
+          $ref: '#/components/schemas/UpdateMediaRules_data'
+      required:
+      - data
+    MediaRulesCollection:
+      properties:
+        data:
+          $ref: '#/components/schemas/MediaRulesCollection_data'
+      required:
+      - data
+      - links
     MediaCollection_data_attributes:
       properties:
         data:
           items:
-            $ref: '#/components/schemas/MediaData'
+            $ref: '#/components/schemas/MediaRulesData'
           type: array
       required:
       - data
@@ -84,7 +154,7 @@ components:
       properties:
         type:
           enum:
-          - media_collection
+          - media_rules_collection
           type: string
         attributes:
           $ref: '#/components/schemas/MediaCollection_data_attributes'
@@ -99,9 +169,6 @@ components:
         media_type:
           description: content type
           type: string
-        owner_id:
-          description: owner id
-          type: string
       required:
       - media_type
       - resource_id
@@ -113,6 +180,110 @@ components:
           type: string
         attributes:
           $ref: '#/components/schemas/UploadMedia_data_attributes'
+      required:
+      - attributes
+      - type
+    CreateMediaRules_data_attributes:
+      properties:
+        max_size:
+          description: Maximum file size in bytes
+          format: int64
+          type: integer
+        allowed_exits:
+          items:
+            description: Allowed exits for the media
+            example:
+            - .jpg
+            - .png
+            type: string
+          type: array
+        folder:
+          description: Folder where the media is stored
+          type: string
+        roles:
+          items:
+            description: Roles that can access the media
+            enum:
+            - admin
+            - user
+            type: string
+          type: array
+      required:
+      - allowed_exits
+      - folder
+      - max_size
+      - roles
+    CreateMediaRules_data:
+      properties:
+        id:
+          description: media type
+          type: string
+        type:
+          enum:
+          - media_rules_create
+          type: string
+        attributes:
+          $ref: '#/components/schemas/CreateMediaRules_data_attributes'
+      required:
+      - attributes
+      - id
+      - type
+    UpdateMediaRules_data_attributes:
+      properties:
+        max_size:
+          description: Maximum file size in bytes
+          format: int64
+          type: integer
+        allowed_exits:
+          items:
+            description: Allowed exits for the media
+            example:
+            - .jpg
+            - .png
+            type: string
+          type: array
+        folder:
+          description: Folder where the media is stored
+          type: string
+        roles:
+          items:
+            description: Roles that can access the media
+            enum:
+            - admin
+            - user
+            type: string
+          type: array
+    UpdateMediaRules_data:
+      properties:
+        id:
+          description: media type
+          type: string
+        type:
+          enum:
+          - media_rules_update
+          type: string
+        attributes:
+          $ref: '#/components/schemas/UpdateMediaRules_data_attributes'
+      required:
+      - attributes
+      - id
+      - type
+    MediaRulesCollection_data_attributes:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/MediaData'
+          type: array
+      required:
+      - data
+    MediaRulesCollection_data:
+      properties:
+        type:
+          enum:
+          - media_collection
+          type: string
+        attributes:
+          $ref: '#/components/schemas/MediaRulesCollection_data_attributes'
       required:
       - attributes
       - type

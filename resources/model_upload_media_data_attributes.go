@@ -25,8 +25,6 @@ type UploadMediaDataAttributes struct {
 	ResourceId string `json:"resource_id"`
 	// content type
 	MediaType string `json:"media_type"`
-	// owner id
-	OwnerId *string `json:"owner_id,omitempty"`
 }
 
 type _UploadMediaDataAttributes UploadMediaDataAttributes
@@ -98,38 +96,6 @@ func (o *UploadMediaDataAttributes) SetMediaType(v string) {
 	o.MediaType = v
 }
 
-// GetOwnerId returns the OwnerId field value if set, zero value otherwise.
-func (o *UploadMediaDataAttributes) GetOwnerId() string {
-	if o == nil || IsNil(o.OwnerId) {
-		var ret string
-		return ret
-	}
-	return *o.OwnerId
-}
-
-// GetOwnerIdOk returns a tuple with the OwnerId field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *UploadMediaDataAttributes) GetOwnerIdOk() (*string, bool) {
-	if o == nil || IsNil(o.OwnerId) {
-		return nil, false
-	}
-	return o.OwnerId, true
-}
-
-// HasOwnerId returns a boolean if a field has been set.
-func (o *UploadMediaDataAttributes) HasOwnerId() bool {
-	if o != nil && !IsNil(o.OwnerId) {
-		return true
-	}
-
-	return false
-}
-
-// SetOwnerId gets a reference to the given string and assigns it to the OwnerId field.
-func (o *UploadMediaDataAttributes) SetOwnerId(v string) {
-	o.OwnerId = &v
-}
-
 func (o UploadMediaDataAttributes) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -142,9 +108,6 @@ func (o UploadMediaDataAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["resource_id"] = o.ResourceId
 	toSerialize["media_type"] = o.MediaType
-	if !IsNil(o.OwnerId) {
-		toSerialize["owner_id"] = o.OwnerId
-	}
 	return toSerialize, nil
 }
 

@@ -1,0 +1,27 @@
+type: object
+required:
+  - max_size
+  - allowed_exits
+  - folder
+  - roles
+properties:
+  max_size:
+    type: integer
+    format: int64
+    description: "Maximum file size in bytes"
+  allowed_exits:
+    type: array
+    items:
+      type: string
+      example: [".jpg", ".png"]
+      description: "Allowed exits for the media"
+  folder:
+    type: string
+    description: "Folder where the media is stored"
+  roles:
+    type: array
+    items:
+      type: string
+      enum: [ admin, user ]
+      description: "Roles that can access the media"
+

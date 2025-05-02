@@ -1,0 +1,14 @@
+type: object
+required:
+  - id
+  - type
+  - attributes
+properties:
+  id:
+    type: string
+    description: "media type"
+  type:
+    type: string
+    enum: [ media_rules ]
+  attributes:
+    $ref: './MediaRulesAttributes.yaml'

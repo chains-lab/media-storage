@@ -1,46 +1,46 @@
-# MediaCollectionDataAttributes
+# CreateMediaRules
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**[]MediaRulesData**](MediaRulesData.md) |  | 
+**Data** | [**CreateMediaRulesData**](CreateMediaRulesData.md) |  | 
 
 ## Methods
 
-### NewMediaCollectionDataAttributes
+### NewCreateMediaRules
 
-`func NewMediaCollectionDataAttributes(data []MediaRulesData, ) *MediaCollectionDataAttributes`
+`func NewCreateMediaRules(data CreateMediaRulesData, ) *CreateMediaRules`
 
-NewMediaCollectionDataAttributes instantiates a new MediaCollectionDataAttributes object
+NewCreateMediaRules instantiates a new CreateMediaRules object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewMediaCollectionDataAttributesWithDefaults
+### NewCreateMediaRulesWithDefaults
 
-`func NewMediaCollectionDataAttributesWithDefaults() *MediaCollectionDataAttributes`
+`func NewCreateMediaRulesWithDefaults() *CreateMediaRules`
 
-NewMediaCollectionDataAttributesWithDefaults instantiates a new MediaCollectionDataAttributes object
+NewCreateMediaRulesWithDefaults instantiates a new CreateMediaRules object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *MediaCollectionDataAttributes) GetData() []MediaRulesData`
+`func (o *CreateMediaRules) GetData() CreateMediaRulesData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *MediaCollectionDataAttributes) GetDataOk() (*[]MediaRulesData, bool)`
+`func (o *CreateMediaRules) GetDataOk() (*CreateMediaRulesData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *MediaCollectionDataAttributes) SetData(v []MediaRulesData)`
+`func (o *CreateMediaRules) SetData(v CreateMediaRulesData)`
 
 SetData sets Data field to given value.
 

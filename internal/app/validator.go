@@ -6,15 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"regexp"
 
 	"github.com/google/uuid"
 	"github.com/hs-zavet/media-storage/internal/app/ape"
 	"github.com/hs-zavet/media-storage/internal/enums"
 	"github.com/hs-zavet/tokens/roles"
 )
-
-var placeholderRE = regexp.MustCompile(`\{[^}]+\}`)
 
 func (a App) validateCreate(
 	mediaType enums.MediaType,
@@ -62,7 +59,7 @@ func (a App) validateCreate(
 		return "", ape.ErrUserNotAllowedToUploadMedia
 	}
 
-	folder := placeholderRE.ReplaceAllString(rule.Folder, resourceID.String())
+	folder := fmt.Sprintf("%s/%s", rule.Folder, resourceID.String())
 	return folder, nil
 }
 

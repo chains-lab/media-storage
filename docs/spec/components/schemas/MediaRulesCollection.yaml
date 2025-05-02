@@ -6,12 +6,12 @@ properties:
   data:
     type: object
     required:
-    - type
-    - attributes
+      - type
+      - attributes
     properties:
       type:
         type: string
-        enum: [ media_rules_collection ]
+        enum: [ media_collection ]
       attributes:
         type: object
         required:
@@ -20,4 +20,4 @@ properties:
           data:
             type: array
             items:
-             $ref: './MediaRulesData.yaml'
+              $ref: './MediaData.yaml'

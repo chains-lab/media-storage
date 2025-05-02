@@ -26,3 +26,16 @@ components:
       $ref: './spec/components/schemas/MediaCollection.yaml'
     UploadMedia:
       $ref: './spec/components/schemas/UploadMedia.yaml'
+
+    MediaRules:
+      $ref: './spec/components/schemas/MediaRules.yaml'
+    MediaRulesData:
+      $ref: './spec/components/schemas/MediaRulesData.yaml'
+    MediaRulesAttributes:
+      $ref: './spec/components/schemas/MediaRulesAttributes.yaml'
+    CreateMediaRules:
+      $ref: './spec/components/schemas/CreateMediaRules.yaml'
+    UpdateMediaRules:
+      $ref: './spec/components/schemas/UpdateMediaRules.yaml'
+    MediaRulesCollection:
+      $ref: './spec/components/schemas/MediaRulesCollection.yaml'

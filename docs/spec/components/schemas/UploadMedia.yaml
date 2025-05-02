@@ -23,6 +23,3 @@ properties:
           media_type:
             type: string
             description: "content type"
-          owner_id:
-            type: string
-            description: "owner id"

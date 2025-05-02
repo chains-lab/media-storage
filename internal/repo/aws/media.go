@@ -123,34 +123,6 @@ func (s *S3Client) DeleteFile(ctx context.Context, fileData FileData) error {
 	return nil
 }
 
-func (s *S3Client) DeleteFilesInFolder(ctx context.Context, folder string) error {
-	input := &s3.ListObjectsV2Input{
-		Bucket:    aws.String(s.bucket),
-		Prefix:    aws.String(folder + "/"),
-		Delimiter: aws.String("/"),
-	}
-	page, err := s.client.ListObjectsV2(ctx, input)
-	if err != nil {
-		return fmt.Errorf("listing objects for delete: %w", err)
-	}
-	if len(page.Contents) == 0 {
-		return nil
-	}
-
-	var toDelete []s3types.ObjectIdentifier
-	for _, obj := range page.Contents {
-		toDelete = append(toDelete, s3types.ObjectIdentifier{Key: obj.Key})
-	}
-	_, err = s.client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
-		Bucket: aws.String(s.bucket),
-		Delete: &s3types.Delete{Objects: toDelete, Quiet: aws.Bool(true)},
-	})
-	if err != nil {
-		return fmt.Errorf("batch delete objects in %s: %w", folder, err)
-	}
-	return nil
-}
-
 func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit uint) ([]MediaModel, error) {
 	var results []MediaModel
 	input := &s3.ListObjectsV2Input{
@@ -209,4 +181,46 @@ func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit u
 		}
 	}
 	return results, nil
+}
+
+func (s *S3Client) DeleteFilesByPrefix(ctx context.Context, prefix string) error {
+	paginator := s3.NewListObjectsV2Paginator(s.client, &s3.ListObjectsV2Input{
+		Bucket: aws.String(s.bucket),
+		Prefix: aws.String(prefix),
+	})
+
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return fmt.Errorf("listing S3 objects with prefix %q: %w", prefix, err)
+		}
+
+		if len(page.Contents) == 0 {
+			// больше нет объектов под этим префиксом
+			return nil
+		}
+
+		// Собираем идентификаторы для батч-удаления
+		identifiers := make([]s3types.ObjectIdentifier, 0, len(page.Contents))
+		for _, obj := range page.Contents {
+			identifiers = append(identifiers, s3types.ObjectIdentifier{
+				Key: obj.Key,
+			})
+		}
+
+		// Удаляем до 1000 штук за раз
+		quite := true
+		_, err = s.client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+			Bucket: aws.String(s.bucket),
+			Delete: &s3types.Delete{
+				Objects: identifiers,
+				Quiet:   &quite,
+			},
+		})
+		if err != nil {
+			return fmt.Errorf("deleting S3 objects with prefix %q: %w", prefix, err)
+		}
+	}
+
+	return nil
 }

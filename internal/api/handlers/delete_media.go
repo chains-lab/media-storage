@@ -22,11 +22,11 @@ func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourceID, err := uuid.Parse(chi.URLParam(r, "resource_id"))
+	resourceID, err := uuid.Parse(chi.URLParam(r, "media_resource_type"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"resource_id": validation.NewError("resource_id", "invalid UUID format"),
+			"media_resource_type": validation.NewError("media_resource_type", "invalid UUID format"),
 		})...)
 		return
 	}

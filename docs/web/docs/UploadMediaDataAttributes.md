@@ -6,7 +6,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ResourceId** | **string** | resource id | 
 **MediaType** | **string** | content type | 
-**OwnerId** | Pointer to **string** | owner id | [optional] 
 
 ## Methods
 
@@ -66,31 +65,6 @@ and a boolean to check if the value has been set.
 
 SetMediaType sets MediaType field to given value.
 
-
-### GetOwnerId
-
-`func (o *UploadMediaDataAttributes) GetOwnerId() string`
-
-GetOwnerId returns the OwnerId field if non-nil, zero value otherwise.
-
-### GetOwnerIdOk
-
-`func (o *UploadMediaDataAttributes) GetOwnerIdOk() (*string, bool)`
-
-GetOwnerIdOk returns a tuple with the OwnerId field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetOwnerId
-
-`func (o *UploadMediaDataAttributes) SetOwnerId(v string)`
-
-SetOwnerId sets OwnerId field to given value.
-
-### HasOwnerId
-
-`func (o *UploadMediaDataAttributes) HasOwnerId() bool`
-
-HasOwnerId returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

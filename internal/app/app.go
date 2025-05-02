@@ -24,6 +24,7 @@ type repoMedia interface {
 	AddMedia(ctx context.Context, reader io.Reader, input repo.AddMediaInput) (repo.MediaModel, error)
 	GetMedia(ctx context.Context, filename uuid.UUID) (repo.MediaModel, error)
 	DeleteMedia(ctx context.Context, id uuid.UUID) error
+	DeleteFilesByPrefix(ctx context.Context, prefix string) error
 }
 
 type MediaRulesRepo interface {
@@ -159,7 +160,7 @@ func (a App) DeleteMedia(ctx context.Context, request DeleteMediaRequest) error 
 	return nil
 }
 
-type AddMediaRulesRequest struct {
+type CreateMediaRulesRequest struct {
 	MediaType    enums.MediaType
 	MaxSize      int64
 	AllowedExits []string
@@ -167,7 +168,7 @@ type AddMediaRulesRequest struct {
 	Roles        []roles.Role
 }
 
-func (a App) AddMediaRules(ctx context.Context, request AddMediaRulesRequest) (models.MediaRules, error) {
+func (a App) CreateMediaRules(ctx context.Context, request CreateMediaRulesRequest) (models.MediaRules, error) {
 	repoInput := repo.CreateMediaRulesInput{
 		MediaType:    request.MediaType,
 		MaxSize:      request.MaxSize,
@@ -250,7 +251,27 @@ func (a App) UpdateMediaRules(ctx context.Context, mType enums.MediaType, reques
 }
 
 func (a App) DeleteMediaRules(ctx context.Context, mType enums.MediaType) error {
-	err := a.repoRules.Delete(ctx, mType)
+	rule, err := a.repoRules.Get(context.TODO(), mType)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ape.ErrMediaRulesNotFound
+		default:
+			return fmt.Errorf("get media rules: %w", err)
+		}
+	}
+
+	err = a.repoMedia.DeleteFilesByPrefix(ctx, rule.Folder)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ape.ErrMediaNotFound
+		default:
+			return fmt.Errorf("delete media: %w", err)
+		}
+	}
+
+	err = a.repoRules.Delete(ctx, mType)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
