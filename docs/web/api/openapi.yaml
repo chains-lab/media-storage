@@ -93,9 +93,6 @@ components:
       - type
     UploadMedia_data_attributes:
       properties:
-        resource_type:
-          description: resource type
-          type: string
         resource_id:
           description: resource id
           type: string
@@ -108,12 +105,11 @@ components:
       required:
       - media_type
       - resource_id
-      - resource_type
     UploadMedia_data:
       properties:
         type:
           enum:
-          - media_upload
+          - upload_media
           type: string
         attributes:
           $ref: '#/components/schemas/UploadMedia_data_attributes'

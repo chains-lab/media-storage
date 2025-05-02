@@ -21,8 +21,6 @@ var _ MappedNullable = &UploadMediaDataAttributes{}
 
 // UploadMediaDataAttributes struct for UploadMediaDataAttributes
 type UploadMediaDataAttributes struct {
-	// resource type
-	ResourceType string `json:"resource_type"`
 	// resource id
 	ResourceId string `json:"resource_id"`
 	// content type
@@ -37,9 +35,8 @@ type _UploadMediaDataAttributes UploadMediaDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUploadMediaDataAttributes(resourceType string, resourceId string, mediaType string) *UploadMediaDataAttributes {
+func NewUploadMediaDataAttributes(resourceId string, mediaType string) *UploadMediaDataAttributes {
 	this := UploadMediaDataAttributes{}
-	this.ResourceType = resourceType
 	this.ResourceId = resourceId
 	this.MediaType = mediaType
 	return &this
@@ -51,30 +48,6 @@ func NewUploadMediaDataAttributes(resourceType string, resourceId string, mediaT
 func NewUploadMediaDataAttributesWithDefaults() *UploadMediaDataAttributes {
 	this := UploadMediaDataAttributes{}
 	return &this
-}
-
-// GetResourceType returns the ResourceType field value
-func (o *UploadMediaDataAttributes) GetResourceType() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.ResourceType
-}
-
-// GetResourceTypeOk returns a tuple with the ResourceType field value
-// and a boolean to check if the value has been set.
-func (o *UploadMediaDataAttributes) GetResourceTypeOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.ResourceType, true
-}
-
-// SetResourceType sets field value
-func (o *UploadMediaDataAttributes) SetResourceType(v string) {
-	o.ResourceType = v
 }
 
 // GetResourceId returns the ResourceId field value
@@ -167,7 +140,6 @@ func (o UploadMediaDataAttributes) MarshalJSON() ([]byte, error) {
 
 func (o UploadMediaDataAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["resource_type"] = o.ResourceType
 	toSerialize["resource_id"] = o.ResourceId
 	toSerialize["media_type"] = o.MediaType
 	if !IsNil(o.OwnerId) {
@@ -181,7 +153,6 @@ func (o *UploadMediaDataAttributes) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"resource_type",
 		"resource_id",
 		"media_type",
 	}

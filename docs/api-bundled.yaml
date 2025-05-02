@@ -99,17 +99,13 @@ components:
             type:
               type: string
               enum:
-                - media_upload
+                - upload_media
             attributes:
               type: object
               required:
-                - resource_type
                 - resource_id
                 - media_type
               properties:
-                resource_type:
-                  type: string
-                  description: resource type
                 resource_id:
                   type: string
                   description: resource id

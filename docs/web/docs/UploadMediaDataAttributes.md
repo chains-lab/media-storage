@@ -4,7 +4,6 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ResourceType** | **string** | resource type | 
 **ResourceId** | **string** | resource id | 
 **MediaType** | **string** | content type | 
 **OwnerId** | Pointer to **string** | owner id | [optional] 
@@ -13,7 +12,7 @@ Name | Type | Description | Notes
 
 ### NewUploadMediaDataAttributes
 
-`func NewUploadMediaDataAttributes(resourceType string, resourceId string, mediaType string, ) *UploadMediaDataAttributes`
+`func NewUploadMediaDataAttributes(resourceId string, mediaType string, ) *UploadMediaDataAttributes`
 
 NewUploadMediaDataAttributes instantiates a new UploadMediaDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -27,26 +26,6 @@ will change when the set of required properties is changed
 NewUploadMediaDataAttributesWithDefaults instantiates a new UploadMediaDataAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
-
-### GetResourceType
-
-`func (o *UploadMediaDataAttributes) GetResourceType() string`
-
-GetResourceType returns the ResourceType field if non-nil, zero value otherwise.
-
-### GetResourceTypeOk
-
-`func (o *UploadMediaDataAttributes) GetResourceTypeOk() (*string, bool)`
-
-GetResourceTypeOk returns a tuple with the ResourceType field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetResourceType
-
-`func (o *UploadMediaDataAttributes) SetResourceType(v string)`
-
-SetResourceType sets ResourceType field to given value.
-
 
 ### GetResourceId
 

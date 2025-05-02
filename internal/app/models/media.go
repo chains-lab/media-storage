@@ -16,14 +16,12 @@ type Media struct {
 
 	//Name of resource
 	ResourceType enums.ResourceType `db:"resource_type"`
-	//ID of resource
+	//Filename of resource
 	ResourceID uuid.UUID `db:"resource_id"`
-
 	//MediaType of resource
 	MediaType enums.MediaType `db:"media_type"`
 
 	//Owner ID of resource who
-	OwnerID *uuid.UUID `db:"owner_id,omitempty"`
-
+	OwnerID   uuid.UUID `db:"owner_id"`
 	CreatedAt time.Time `db:"created_at"`
 }

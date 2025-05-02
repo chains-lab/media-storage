@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
 	"github.com/hs-zavet/comtools/httpkit"
@@ -11,6 +12,7 @@ import (
 	"github.com/hs-zavet/media-storage/internal/api/requests"
 	"github.com/hs-zavet/media-storage/internal/api/responses"
 	"github.com/hs-zavet/media-storage/internal/app"
+	"github.com/hs-zavet/media-storage/internal/app/ape"
 	"github.com/hs-zavet/media-storage/internal/enums"
 	"github.com/hs-zavet/tokens"
 )
@@ -30,7 +32,7 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourcesType, err := enums.ParseResourceType(req.Data.Attributes.ResourceType)
+	resourcesType, err := enums.ParseResourceType(chi.URLParam(r, "media_resource_type"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
@@ -61,27 +63,34 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		ResourceType: resourcesType,
 		ResourceID:   ResourcesID,
 		MediaType:    mediaType,
+		User:         user,
+		File:         file,
+		FileHeader:   fileHeader,
 	}
 
-	if req.Data.Attributes.OwnerId != nil {
-		ownerID, err := uuid.Parse(*req.Data.Attributes.OwnerId)
-		if err != nil {
-			h.log.WithError(err).Warn("error parsing request")
-			httpkit.RenderErr(w, problems.BadRequest(err)...)
-			return
-		}
-		requestToApp.OwnerID = &ownerID
-	}
-
-	res, err := h.app.UploadMedia(r.Context(), user, file, fileHeader, requestToApp)
+	res, err := h.app.UploadMedia(r.Context(), requestToApp)
 	if err != nil {
 		switch {
-		case errors.Is(err, nil):
+		case errors.Is(err, ape.ErrMediaNotFound):
 			httpkit.RenderErr(w, problems.NotFound("media not found"))
+		case errors.Is(err, ape.ErrMediaRulesNotFound):
+			//TODO: check if this is the right error
+			httpkit.RenderErr(w, problems.NotFound("media rules for this media type not found"))
+		case errors.Is(err, ape.ErrFileToLarge):
+			httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
+				"upload_data": validation.NewError("file", "file too large"),
+			})...)
+		case errors.Is(err, ape.ErrFileFormatNotAllowed):
+			httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
+				"upload_data": validation.NewError("file", "file format not allowed"),
+			})...)
+		case errors.Is(err, ape.ErrUserNotAllowedToUploadMedia):
+			httpkit.RenderErr(w, problems.Forbidden("user role not allowed to upload this type media"))
 		default:
-			h.log.WithError(err).Errorf("error uploading media")
 			httpkit.RenderErr(w, problems.InternalError())
 		}
+
+		h.log.WithError(err).Errorf("error uploading media")
 		return
 	}
 
