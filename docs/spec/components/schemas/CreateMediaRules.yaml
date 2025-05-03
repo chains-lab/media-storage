@@ -11,31 +11,18 @@ properties:
     properties:
       id:
         type: string
-        description: "media type"
+        description: "media resource type"
       type:
         type: string
-        enum: [ media_rules_create ]
+        enum: [ create_media_rules ]
       attributes:
         type: object
         required:
-            - max_size
-            - allowed_exits
-            - folder
-            - roles
+          - exit_size
+          - roles
         properties:
-          max_size:
-            type: integer
-            format: int64
-            description: "Maximum file size in bytes"
-          allowed_exits:
-            type: array
-            items:
-              type: string
-              example: [ ".jpg", ".png" ]
-              description: "Allowed exits for the media"
-          folder:
-            type: string
-            description: "Folder where the media is stored"
+          exit_size:
+            $ref: './ExitSize.yaml'
           roles:
             type: array
             items:

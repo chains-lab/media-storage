@@ -14,11 +14,11 @@ import (
 )
 
 func (h *Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
-	resourceID, err := uuid.Parse(chi.URLParam(r, "media_resource_type"))
+	resourceID, err := uuid.Parse(chi.URLParam(r, "media_id"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"media_resource_type": validation.NewError("media_resource_type", "invalid UUID format"),
+			"media_id": validation.NewError("media_id", "invalid UUID format"),
 		})...)
 		return
 	}

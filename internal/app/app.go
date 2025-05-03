@@ -24,20 +24,19 @@ type repoMedia interface {
 	AddMedia(ctx context.Context, reader io.Reader, input repo.AddMediaInput) (repo.MediaModel, error)
 	GetMedia(ctx context.Context, filename uuid.UUID) (repo.MediaModel, error)
 	DeleteMedia(ctx context.Context, id uuid.UUID) error
-	DeleteFilesByPrefix(ctx context.Context, prefix string) error
+	DeleteFilesByResourceType(ctx context.Context, prefix string) error
 }
 
 type MediaRulesRepo interface {
 	Create(ctx context.Context, input repo.CreateMediaRulesInput) (repo.MediaRulesModel, error)
-	Get(ctx context.Context, mType enums.MediaType) (repo.MediaRulesModel, error)
-	Update(ctx context.Context, input repo.MediaRulesUpdateInput) error
-	Delete(ctx context.Context, mType enums.MediaType) error
+	Get(ctx context.Context, resourceType string) (repo.MediaRulesModel, error)
+	Update(ctx context.Context, resourceType string, input repo.MediaRulesUpdateInput) error
+	Delete(ctx context.Context, resourceType string) error
 }
 
 type App struct {
 	repoMedia repoMedia
 	repoRules MediaRulesRepo
-	//mediaValidator validator.Validator
 }
 
 func NewApp(cfg config.Config) (App, error) {
@@ -58,36 +57,31 @@ func NewApp(cfg config.Config) (App, error) {
 }
 
 type UploadMediaRequest struct {
-	ResourceType enums.ResourceType
-	ResourceID   uuid.UUID
-	MediaType    enums.MediaType
 	User         tokens.AccountData
-	File         io.Reader
 	FileHeader   *multipart.FileHeader
+	File         multipart.File
+	ResourceType string
+	ResourceID   uuid.UUID
+	ExitSize     []enums.ExitSize
+	Roles        []roles.Role
+	CreatedAt    time.Time
 }
 
 func (a App) UploadMedia(ctx context.Context, request UploadMediaRequest) (models.Media, error) {
 	fileID := uuid.New()
 	createdAt := time.Now().UTC()
 
-	folder, err := a.validateCreate(
-		request.MediaType,
-		request.FileHeader.Size,
-		request.FileHeader.Filename,
-		request.ResourceID,
-		request.User.Role,
-	)
+	err := a.validateCreate(request.ResourceType, request.FileHeader.Size, request.FileHeader.Filename, request.User.Role)
 	if err != nil {
 		return models.Media{}, err
 	}
 
 	repoInput := repo.AddMediaInput{
-		Folder:       folder,
 		Filename:     fileID,
 		Ext:          filepath.Ext(request.FileHeader.Filename),
 		ResourceType: request.ResourceType,
 		ResourceID:   request.ResourceID,
-		MediaType:    request.MediaType,
+		OwnerID:      request.User.AccountID,
 		CreatedAt:    createdAt,
 	}
 
@@ -101,11 +95,9 @@ func (a App) UploadMedia(ctx context.Context, request UploadMediaRequest) (model
 
 	return models.Media{
 		ID:           media.ID,
-		Folder:       media.Folder,
 		Ext:          media.Ext,
 		ResourceType: media.ResourceType,
 		ResourceID:   media.ResourceID,
-		MediaType:    media.MediaType,
 		CreatedAt:    media.CreatedAt,
 		OwnerID:      media.OwnerID,
 		Size:         request.FileHeader.Size,
@@ -127,9 +119,10 @@ func (a App) GetMedia(ctx context.Context, resourceID uuid.UUID) (models.Media, 
 }
 
 type DeleteMediaRequest struct {
-	Role        roles.Role
-	ResourceID  uuid.UUID
-	InitiatorID uuid.UUID
+	User         tokens.AccountData
+	ResourceType string
+	ResourceID   uuid.UUID
+	InitiatorID  uuid.UUID
 }
 
 func (a App) DeleteMedia(ctx context.Context, request DeleteMediaRequest) error {
@@ -143,7 +136,7 @@ func (a App) DeleteMedia(ctx context.Context, request DeleteMediaRequest) error 
 		}
 	}
 
-	if err = a.validateDelete(media.OwnerID, request.InitiatorID, request.Role); err != nil {
+	if err = a.validateDelete(media.OwnerID, request.InitiatorID, request.User.Role); err != nil {
 		return err
 	}
 
@@ -161,23 +154,27 @@ func (a App) DeleteMedia(ctx context.Context, request DeleteMediaRequest) error 
 }
 
 type CreateMediaRulesRequest struct {
-	MediaType    enums.MediaType
-	MaxSize      int64
-	AllowedExits []string
-	Folder       string
-	Roles        []roles.Role
+	ExtSize []enums.ExitSize
+	Roles   []roles.Role
 }
 
-func (a App) CreateMediaRules(ctx context.Context, request CreateMediaRulesRequest) (models.MediaRules, error) {
-	repoInput := repo.CreateMediaRulesInput{
-		MediaType:    request.MediaType,
-		MaxSize:      request.MaxSize,
-		AllowedExits: request.AllowedExits,
-		Folder:       request.Folder,
-		Roles:        request.Roles,
+func (a App) CreateMediaRules(ctx context.Context, resourceType string, request CreateMediaRulesRequest) (models.MediaRules, error) {
+	now := time.Now().UTC()
+
+	_, err := a.GetMediaRules(context.TODO(), resourceType)
+	if !errors.Is(err, ape.ErrMediaRulesNotFound) {
+		return models.MediaRules{}, ape.ErrMediaRulesAlreadyExists
 	}
 
-	rules, err := a.repoRules.Create(ctx, repoInput)
+	repoInput := repo.CreateMediaRulesInput{
+		ResourceType: resourceType,
+		ExitSize:     request.ExtSize,
+		Roles:        request.Roles,
+		UpdatedAt:    now,
+		CreatedAt:    now,
+	}
+
+	res, err := a.repoRules.Create(ctx, repoInput)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -187,17 +184,14 @@ func (a App) CreateMediaRules(ctx context.Context, request CreateMediaRulesReque
 		}
 	}
 
-	return models.MediaRules{
-		MediaType:    rules.MediaType,
-		MaxSize:      rules.MaxSize,
-		AllowedExits: rules.AllowedExits,
-		Folder:       rules.Folder,
-		Roles:        rules.Roles,
-	}, nil
+	return createMediaRulesModel(res), nil
 }
 
-func (a App) GetMediaRules(ctx context.Context, mediaType enums.MediaType) (models.MediaRules, error) {
-	rules, err := a.repoRules.Get(context.TODO(), mediaType)
+func (a App) GetMediaRules(ctx context.Context, resourceType string) (models.MediaRules, error) {
+
+	fmt.Printf("test \n")
+
+	rules, err := a.repoRules.Get(context.TODO(), resourceType)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -207,32 +201,35 @@ func (a App) GetMediaRules(ctx context.Context, mediaType enums.MediaType) (mode
 		}
 	}
 
-	return models.MediaRules{
-		MediaType:    rules.MediaType,
-		MaxSize:      rules.MaxSize,
-		AllowedExits: rules.AllowedExits,
-		Folder:       rules.Folder,
-		Roles:        rules.Roles,
-	}, nil
+	return createMediaRulesModel(rules), nil
 }
 
 type UpdateMediaRulesRequest struct {
-	MediaType    enums.MediaType
-	MaxSize      int64
-	AllowedExits []string
-	Folder       string
-	Roles        []roles.Role
+	ExtSize *[]enums.ExitSize
+	Roles   *[]roles.Role
 }
 
-func (a App) UpdateMediaRules(ctx context.Context, mType enums.MediaType, request UpdateMediaRulesRequest) (models.MediaRules, error) {
-	repoInput := repo.MediaRulesUpdateInput{
-		MaxSize:      &request.MaxSize,
-		AllowedExits: &request.AllowedExits,
-		Folder:       &request.Folder,
-		Roles:        &request.Roles,
+func (a App) UpdateMediaRules(ctx context.Context, resourceType string, request UpdateMediaRulesRequest) (models.MediaRules, error) {
+	now := time.Now().UTC()
+	updated := false
+
+	fmt.Printf("test \n")
+	var repoInput repo.MediaRulesUpdateInput
+	if request.ExtSize != nil {
+		repoInput.ExitSize = request.ExtSize
+		updated = true
+	}
+	if request.Roles != nil {
+		repoInput.Roles = request.Roles
+		updated = true
+	}
+	repoInput.UpdatedAt = now
+
+	if !updated {
+		return a.GetMediaRules(ctx, resourceType)
 	}
 
-	err := a.repoRules.Update(ctx, repoInput)
+	err := a.repoRules.Update(ctx, resourceType, repoInput)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -242,16 +239,21 @@ func (a App) UpdateMediaRules(ctx context.Context, mType enums.MediaType, reques
 		}
 	}
 
-	return models.MediaRules{
-		MaxSize:      request.MaxSize,
-		AllowedExits: request.AllowedExits,
-		Folder:       request.Folder,
-		Roles:        request.Roles,
-	}, nil
+	rules, err := a.repoRules.Get(ctx, resourceType)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return models.MediaRules{}, ape.ErrMediaRulesNotFound
+		default:
+			return models.MediaRules{}, fmt.Errorf("get media rules: %w", err)
+		}
+	}
+
+	return createMediaRulesModel(rules), nil
 }
 
-func (a App) DeleteMediaRules(ctx context.Context, mType enums.MediaType) error {
-	rule, err := a.repoRules.Get(context.TODO(), mType)
+func (a App) DeleteMediaRules(ctx context.Context, resourceType string) error {
+	_, err := a.repoRules.Get(context.TODO(), resourceType)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -261,7 +263,7 @@ func (a App) DeleteMediaRules(ctx context.Context, mType enums.MediaType) error 
 		}
 	}
 
-	err = a.repoMedia.DeleteFilesByPrefix(ctx, rule.Folder)
+	err = a.repoMedia.DeleteFilesByResourceType(ctx, resourceType)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -271,7 +273,7 @@ func (a App) DeleteMediaRules(ctx context.Context, mType enums.MediaType) error 
 		}
 	}
 
-	err = a.repoRules.Delete(ctx, mType)
+	err = a.repoRules.Delete(ctx, resourceType)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -287,14 +289,22 @@ func (a App) DeleteMediaRules(ctx context.Context, mType enums.MediaType) error 
 func createMediaModel(media repo.MediaModel) models.Media {
 	return models.Media{
 		ID:           media.ID,
-		Folder:       media.Folder,
 		Ext:          media.Ext,
 		Size:         media.Size,
 		URL:          media.URL,
 		OwnerID:      media.OwnerID,
 		ResourceType: media.ResourceType,
 		ResourceID:   media.ResourceID,
-		MediaType:    media.MediaType,
 		CreatedAt:    media.CreatedAt,
+	}
+}
+
+func createMediaRulesModel(mediaRules repo.MediaRulesModel) models.MediaRules {
+	return models.MediaRules{
+		ResourceType: mediaRules.ResourceType,
+		ExitSize:     mediaRules.ExitSize,
+		Roles:        mediaRules.Roles,
+		CreatedAt:    mediaRules.CreatedAt,
+		UpdatedAt:    mediaRules.UpdatedAt,
 	}
 }

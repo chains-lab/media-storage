@@ -12,6 +12,7 @@ package resources
 
 import (
 	"encoding/json"
+	"time"
 	"bytes"
 	"fmt"
 )
@@ -21,12 +22,12 @@ var _ MappedNullable = &MediaRulesAttributes{}
 
 // MediaRulesAttributes struct for MediaRulesAttributes
 type MediaRulesAttributes struct {
-	// Maximum file size in bytes
-	MaxSize int64 `json:"max_size"`
-	AllowedExits []string `json:"allowed_exits"`
-	// Folder where the media is stored
-	Folder string `json:"folder"`
+	ExitSize []ExitSizeInner `json:"exit_size"`
 	Roles []string `json:"roles"`
+	// Date and time when the media rules were last updated
+	UpdatedAt time.Time `json:"updated_at"`
+	// Date and time when the media rules were created
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type _MediaRulesAttributes MediaRulesAttributes
@@ -35,12 +36,12 @@ type _MediaRulesAttributes MediaRulesAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewMediaRulesAttributes(maxSize int64, allowedExits []string, folder string, roles []string) *MediaRulesAttributes {
+func NewMediaRulesAttributes(exitSize []ExitSizeInner, roles []string, updatedAt time.Time, createdAt time.Time) *MediaRulesAttributes {
 	this := MediaRulesAttributes{}
-	this.MaxSize = maxSize
-	this.AllowedExits = allowedExits
-	this.Folder = folder
+	this.ExitSize = exitSize
 	this.Roles = roles
+	this.UpdatedAt = updatedAt
+	this.CreatedAt = createdAt
 	return &this
 }
 
@@ -52,76 +53,28 @@ func NewMediaRulesAttributesWithDefaults() *MediaRulesAttributes {
 	return &this
 }
 
-// GetMaxSize returns the MaxSize field value
-func (o *MediaRulesAttributes) GetMaxSize() int64 {
+// GetExitSize returns the ExitSize field value
+func (o *MediaRulesAttributes) GetExitSize() []ExitSizeInner {
 	if o == nil {
-		var ret int64
+		var ret []ExitSizeInner
 		return ret
 	}
 
-	return o.MaxSize
+	return o.ExitSize
 }
 
-// GetMaxSizeOk returns a tuple with the MaxSize field value
+// GetExitSizeOk returns a tuple with the ExitSize field value
 // and a boolean to check if the value has been set.
-func (o *MediaRulesAttributes) GetMaxSizeOk() (*int64, bool) {
+func (o *MediaRulesAttributes) GetExitSizeOk() ([]ExitSizeInner, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.MaxSize, true
+	return o.ExitSize, true
 }
 
-// SetMaxSize sets field value
-func (o *MediaRulesAttributes) SetMaxSize(v int64) {
-	o.MaxSize = v
-}
-
-// GetAllowedExits returns the AllowedExits field value
-func (o *MediaRulesAttributes) GetAllowedExits() []string {
-	if o == nil {
-		var ret []string
-		return ret
-	}
-
-	return o.AllowedExits
-}
-
-// GetAllowedExitsOk returns a tuple with the AllowedExits field value
-// and a boolean to check if the value has been set.
-func (o *MediaRulesAttributes) GetAllowedExitsOk() ([]string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return o.AllowedExits, true
-}
-
-// SetAllowedExits sets field value
-func (o *MediaRulesAttributes) SetAllowedExits(v []string) {
-	o.AllowedExits = v
-}
-
-// GetFolder returns the Folder field value
-func (o *MediaRulesAttributes) GetFolder() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Folder
-}
-
-// GetFolderOk returns a tuple with the Folder field value
-// and a boolean to check if the value has been set.
-func (o *MediaRulesAttributes) GetFolderOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Folder, true
-}
-
-// SetFolder sets field value
-func (o *MediaRulesAttributes) SetFolder(v string) {
-	o.Folder = v
+// SetExitSize sets field value
+func (o *MediaRulesAttributes) SetExitSize(v []ExitSizeInner) {
+	o.ExitSize = v
 }
 
 // GetRoles returns the Roles field value
@@ -148,6 +101,54 @@ func (o *MediaRulesAttributes) SetRoles(v []string) {
 	o.Roles = v
 }
 
+// GetUpdatedAt returns the UpdatedAt field value
+func (o *MediaRulesAttributes) GetUpdatedAt() time.Time {
+	if o == nil {
+		var ret time.Time
+		return ret
+	}
+
+	return o.UpdatedAt
+}
+
+// GetUpdatedAtOk returns a tuple with the UpdatedAt field value
+// and a boolean to check if the value has been set.
+func (o *MediaRulesAttributes) GetUpdatedAtOk() (*time.Time, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.UpdatedAt, true
+}
+
+// SetUpdatedAt sets field value
+func (o *MediaRulesAttributes) SetUpdatedAt(v time.Time) {
+	o.UpdatedAt = v
+}
+
+// GetCreatedAt returns the CreatedAt field value
+func (o *MediaRulesAttributes) GetCreatedAt() time.Time {
+	if o == nil {
+		var ret time.Time
+		return ret
+	}
+
+	return o.CreatedAt
+}
+
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
+// and a boolean to check if the value has been set.
+func (o *MediaRulesAttributes) GetCreatedAtOk() (*time.Time, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.CreatedAt, true
+}
+
+// SetCreatedAt sets field value
+func (o *MediaRulesAttributes) SetCreatedAt(v time.Time) {
+	o.CreatedAt = v
+}
+
 func (o MediaRulesAttributes) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -158,10 +159,10 @@ func (o MediaRulesAttributes) MarshalJSON() ([]byte, error) {
 
 func (o MediaRulesAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["max_size"] = o.MaxSize
-	toSerialize["allowed_exits"] = o.AllowedExits
-	toSerialize["folder"] = o.Folder
+	toSerialize["exit_size"] = o.ExitSize
 	toSerialize["roles"] = o.Roles
+	toSerialize["updated_at"] = o.UpdatedAt
+	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
 }
 
@@ -170,10 +171,10 @@ func (o *MediaRulesAttributes) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"max_size",
-		"allowed_exits",
-		"folder",
+		"exit_size",
 		"roles",
+		"updated_at",
+		"created_at",
 	}
 
 	allProperties := make(map[string]interface{})

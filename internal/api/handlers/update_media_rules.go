@@ -12,17 +12,10 @@ import (
 	"github.com/hs-zavet/media-storage/internal/api/responses"
 	"github.com/hs-zavet/media-storage/internal/app"
 	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/media-storage/internal/enums"
-	"github.com/hs-zavet/tokens/roles"
 )
 
 func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
-	mediaResourceType, err := enums.ParseMediaType(chi.URLParam(r, "media_resource_type"))
-	if err != nil {
-		h.log.WithError(err).Warn("Error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
+	resourceType := chi.URLParam(r, "resource_type")
 
 	req, err := requests.UpdateMediaRules(r)
 	if err != nil {
@@ -31,40 +24,32 @@ func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if string(mediaResourceType) == req.Data.Id {
+	if resourceType != req.Data.Id {
+		h.log.WithError(err).Warn("Error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"media_resource_id": validation.NewError("media_resource_id", "invalid media resource id"),
+			"resource_type": validation.NewError("resource_type", "invalid media resource id"),
 		})...)
 		return
 	}
 
 	var updateReq app.UpdateMediaRulesRequest
-	if req.Data.Attributes.AllowedExits != nil {
-		updateReq.AllowedExits = req.Data.Attributes.AllowedExits
-	}
-	if req.Data.Attributes.Folder != nil {
-		updateReq.Folder = *req.Data.Attributes.Folder
-	}
-	if req.Data.Attributes.MaxSize != nil {
-		updateReq.MaxSize = *req.Data.Attributes.MaxSize
-	}
 	if req.Data.Attributes.Roles != nil {
-		newRoles := make([]roles.Role, 0, len(req.Data.Attributes.Roles))
-		for _, role := range req.Data.Attributes.Roles {
-			curRole, err := roles.ParseRole(role)
-			if err != nil {
-				h.log.WithError(err).Warn("error parsing request")
-				httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-					"roles": validation.NewError("roles", "invalid role"),
-				})...)
-				return
-			}
-			newRoles = append(newRoles, curRole)
+		curRoles, err := parseRoles(req.Data.Attributes.Roles)
+		if err != nil {
+			h.log.WithError(err).Warn("error parsing request")
+			httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
+				"roles": validation.NewError("roles", "invalid role"),
+			})...)
+			return
 		}
-		updateReq.Roles = newRoles
+		updateReq.Roles = &curRoles
+	}
+	if req.Data.Attributes.ExitSize != nil {
+		extSize := parseExtSize(req.Data.Attributes.ExitSize)
+		updateReq.ExtSize = &extSize
 	}
 
-	res, err := h.app.UpdateMediaRules(r.Context(), mediaResourceType, updateReq)
+	res, err := h.app.UpdateMediaRules(r.Context(), resourceType, updateReq)
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaRulesNotFound):
@@ -72,7 +57,7 @@ func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
 		default:
 			httpkit.RenderErr(w, problems.InternalError())
 		}
-		h.log.WithError(err).Errorf("error updating media rule %s", mediaResourceType)
+		h.log.WithError(err).Errorf("error updating media rule %s", resourceType)
 		return
 	}
 

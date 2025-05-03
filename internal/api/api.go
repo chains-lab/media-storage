@@ -45,23 +45,23 @@ func NewAPI(cfg config.Config, log *logrus.Logger, app *app.App) Api {
 
 func (a *Api) Run(ctx context.Context, log *logrus.Logger) {
 	auth := tokens.AuthMdl(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey)
-	_ = tokens.AccessGrant(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey, roles.Admin, roles.SuperUser)
+	adminGrant := tokens.AccessGrant(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey, roles.Admin, roles.SuperUser)
 
 	a.router.Route("/hs-news/media-storage", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/media", func(r chi.Router) {
-				r.Route("/{media_resource_type}", func(r chi.Router) {
+				r.Route("/{resource_type}", func(r chi.Router) {
 					r.With(auth).Post("/", a.handlers.UploadMedia)
-					r.With(auth).Delete("/", a.handlers.DeleteMedia)
-					r.Get("/", a.handlers.GetMedia)
+					r.With(adminGrant).Delete("/{media_id}", a.handlers.DeleteMedia)
+					r.Get("/{media_id}", a.handlers.GetMedia)
 				})
 			})
 
 			r.Route("/media-rules", func(r chi.Router) {
-				r.With(auth).Post("/", a.handlers.CreateMediaRules)
-				r.Route("/{media_resource_type}", func(r chi.Router) {
-					r.With(auth).Put("/", a.handlers.UpdateMediaRules)
-					r.With(auth).Delete("/", a.handlers.DeleteMediaRules)
+				r.Route("/{resource_type}", func(r chi.Router) {
+					r.With(adminGrant).Post("/", a.handlers.CreateMediaRules)
+					r.With(adminGrant).Patch("/", a.handlers.UpdateMediaRules)
+					r.With(adminGrant).Delete("/", a.handlers.DeleteMediaRules)
 					r.Get("/", a.handlers.GetMediaRules)
 				})
 			})

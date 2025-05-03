@@ -21,7 +21,7 @@ var _ MappedNullable = &MediaRulesData{}
 
 // MediaRulesData struct for MediaRulesData
 type MediaRulesData struct {
-	// media type
+	// media resource type
 	Id string `json:"id"`
 	Type string `json:"type"`
 	Attributes MediaRulesAttributes `json:"attributes"`

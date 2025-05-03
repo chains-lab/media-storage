@@ -3,7 +3,10 @@ package sqldb
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/hs-zavet/media-storage/internal/enums"
@@ -13,11 +16,11 @@ import (
 const TableMediaRules = "media_rules"
 
 type MediaRulesModel struct {
-	MediaType    enums.MediaType `db:"media_type"`
-	MaxSize      int64           `db:"max_size"`
-	AllowedExits []string        `db:"allowed_exits"`
-	Folder       string          `db:"folder"`
-	Roles        []roles.Role    `db:"roles_access_update"`
+	ResourceType string           `db:"resource_type"`
+	ExitSize     []enums.ExitSize `db:"exit_size"`
+	Roles        []roles.Role     `db:"roles_access_update"`
+	UpdatedAt    time.Time        `db:"updated_at"`
+	CreatedAt    time.Time        `db:"created_at"`
 }
 
 type MediaRulesQ struct {
@@ -41,86 +44,109 @@ func NewMediaRules(db *sql.DB) MediaRulesQ {
 	}
 }
 
+type ExitSizeJSON []enums.ExitSize
+
+func (e *ExitSizeJSON) Value() (driver.Value, error) {
+	return json.Marshal(e)
+}
+func (e *ExitSizeJSON) Scan(src any) error {
+	if src == nil {
+		*e = nil
+		return nil
+	}
+	b, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("exit_size: expect []byte, got %T", src)
+	}
+	return json.Unmarshal(b, (*[]enums.ExitSize)(e))
+}
+
 func (q MediaRulesQ) New() MediaRulesQ {
 	return NewMediaRules(q.db)
 }
 
-type MediaRulesInsertInput struct {
-	MediaType    enums.MediaType
-	MaxSize      int64
-	AllowedExits []string
-	Folder       string
-	Roles        []roles.Role
+type RolesJSON []roles.Role
+
+func (r *RolesJSON) Value() (driver.Value, error) {
+	return json.Marshal(r)
+}
+func (r *RolesJSON) Scan(src any) error {
+	if src == nil {
+		*r = nil
+		return nil
+	}
+	b, ok := src.([]byte)
+	if !ok {
+		return fmt.Errorf("roles_access: expect []byte, got %T", src)
+	}
+	return json.Unmarshal(b, r)
 }
 
-func (q MediaRulesQ) Insert(ctx context.Context, input MediaRulesInsertInput) (MediaRulesModel, error) {
-	values := map[string]interface{}{
-		"media_type":          input.MediaType,
-		"max_size":            input.MaxSize,
-		"allowed_exits":       input.AllowedExits,
-		"folder":              input.Folder,
-		"roles_access_update": input.Roles,
+type MediaRulesInsertInput struct {
+	ResourceType string
+	ExitSize     []enums.ExitSize
+	Roles        []roles.Role
+	UpdatedAt    time.Time
+	CreatedAt    time.Time
+}
+
+func (q MediaRulesQ) Insert(ctx context.Context, in MediaRulesInsertInput) (MediaRulesModel, error) {
+	vals := map[string]any{
+		"resource_type": in.ResourceType,
+		"exit_size":     ExitSizeJSON(in.ExitSize), // ← JSONB
+		"roles_access":  RolesJSON(in.Roles),       // ← JSONB
+		"updated_at":    in.UpdatedAt,
+		"created_at":    in.CreatedAt,
 	}
 
-	query, args, err := q.inserter.Values(values).ToSql()
+	query, args, err := q.inserter.SetMap(vals).ToSql()
 	if err != nil {
 		return MediaRulesModel{}, err
 	}
 
+	executor := q.db.ExecContext
 	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		_, err = tx.ExecContext(ctx, query, args...)
-	} else {
-		_, err = q.db.ExecContext(ctx, query, args...)
+		executor = tx.ExecContext
 	}
-
-	if err != nil {
+	if _, err = executor(ctx, query, args...); err != nil {
 		return MediaRulesModel{}, err
 	}
 
-	res := MediaRulesModel{
-		MediaType:    input.MediaType,
-		MaxSize:      input.MaxSize,
-		AllowedExits: input.AllowedExits,
-		Folder:       input.Folder,
-		Roles:        input.Roles,
-	}
-
-	return res, nil
+	return MediaRulesModel{
+		ResourceType: in.ResourceType,
+		ExitSize:     in.ExitSize,
+		Roles:        in.Roles,
+		UpdatedAt:    in.UpdatedAt,
+		CreatedAt:    in.CreatedAt,
+	}, nil
 }
 
 type MediaRulesUpdateInput struct {
-	MaxSize      *int64
-	AllowedExits *[]string
-	Folder       *string
-	Roles        *[]roles.Role
+	ExitSize  *[]enums.ExitSize
+	Roles     *[]roles.Role
+	UpdatedAt time.Time
 }
 
-func (q MediaRulesQ) Update(ctx context.Context, input MediaRulesUpdateInput) error {
-	values := map[string]interface{}{}
-	if input.MaxSize != nil {
-		values["max_size"] = *input.MaxSize
+func (q MediaRulesQ) Update(ctx context.Context, in MediaRulesUpdateInput) error {
+	vals := map[string]any{"updated_at": in.UpdatedAt}
+
+	if in.ExitSize != nil {
+		vals["exit_size"] = ExitSizeJSON(*in.ExitSize)
 	}
-	if input.AllowedExits != nil {
-		values["allowed_exits"] = *input.AllowedExits
-	}
-	if input.Folder != nil {
-		values["folder"] = *input.Folder
-	}
-	if input.Roles != nil {
-		values["roles_access_update"] = *input.Roles
+	if in.Roles != nil {
+		vals["roles_access"] = RolesJSON(*in.Roles)
 	}
 
-	query, args, err := q.updater.SetMap(values).ToSql()
+	query, args, err := q.updater.SetMap(vals).ToSql()
 	if err != nil {
 		return err
 	}
 
+	executor := q.db.ExecContext
 	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		_, err = tx.ExecContext(ctx, query, args...)
-	} else {
-		_, err = q.db.ExecContext(ctx, query, args...)
+		executor = tx.ExecContext
 	}
-
+	_, err = executor(ctx, query, args...)
 	return err
 }
 
@@ -139,6 +165,25 @@ func (q MediaRulesQ) Delete(ctx context.Context) error {
 	return err
 }
 
+type scanner interface{ Scan(dest ...any) error }
+
+func scanRule(s scanner, out *MediaRulesModel) error {
+	var es ExitSizeJSON
+	var rl RolesJSON
+	if err := s.Scan(
+		&out.ResourceType,
+		&es,
+		&rl,
+		&out.UpdatedAt,
+		&out.CreatedAt,
+	); err != nil {
+		return err
+	}
+	out.ExitSize = []enums.ExitSize(es)
+	out.Roles = []roles.Role(rl)
+	return nil
+}
+
 func (q MediaRulesQ) Select(ctx context.Context) ([]MediaRulesModel, error) {
 	query, args, err := q.selector.ToSql()
 	if err != nil {
@@ -151,22 +196,15 @@ func (q MediaRulesQ) Select(ctx context.Context) ([]MediaRulesModel, error) {
 	}
 	defer rows.Close()
 
-	var mediaRules []MediaRulesModel
+	var list []MediaRulesModel
 	for rows.Next() {
-		var rule MediaRulesModel
-		err = rows.Scan(
-			&rule.MediaType,
-			&rule.MaxSize,
-			&rule.AllowedExits,
-			&rule.Folder,
-			&rule.Roles,
-		)
-		if err != nil {
+		var m MediaRulesModel
+		if err := scanRule(rows, &m); err != nil {
 			return nil, err
 		}
-		mediaRules = append(mediaRules, rule)
+		list = append(list, m)
 	}
-	return mediaRules, nil
+	return list, nil
 }
 
 func (q MediaRulesQ) Get(ctx context.Context) (MediaRulesModel, error) {
@@ -175,33 +213,18 @@ func (q MediaRulesQ) Get(ctx context.Context) (MediaRulesModel, error) {
 		return MediaRulesModel{}, err
 	}
 
-	var rule MediaRulesModel
-	err = q.db.QueryRowContext(ctx, query, args...).Scan(
-		&rule.MediaType,
-		&rule.MaxSize,
-		&rule.AllowedExits,
-		&rule.Folder,
-		&rule.Roles,
-	)
-	if err != nil {
+	var m MediaRulesModel
+	if err := scanRule(q.db.QueryRowContext(ctx, query, args...), &m); err != nil {
 		return MediaRulesModel{}, err
 	}
-	return rule, nil
+	return m, nil
 }
 
-func (q MediaRulesQ) FilterMediaType(mediaType enums.MediaType) MediaRulesQ {
-	q.selector = q.selector.Where(sq.Eq{"media_type": mediaType})
-	q.counter = q.counter.Where(sq.Eq{"media_type": mediaType})
-	q.deleter = q.deleter.Where(sq.Eq{"media_type": mediaType})
-	q.updater = q.updater.Where(sq.Eq{"media_type": mediaType})
-	return q
-}
-
-func (q MediaRulesQ) FilterFolder(folder string) MediaRulesQ {
-	q.selector = q.selector.Where(sq.Eq{"folder": folder})
-	q.counter = q.counter.Where(sq.Eq{"folder": folder})
-	q.deleter = q.deleter.Where(sq.Eq{"folder": folder})
-	q.updater = q.updater.Where(sq.Eq{"folder": folder})
+func (q MediaRulesQ) FilterResourceType(resourceType string) MediaRulesQ {
+	q.selector = q.selector.Where(sq.Eq{"resource_type": resourceType})
+	q.counter = q.counter.Where(sq.Eq{"resource_type": resourceType})
+	q.deleter = q.deleter.Where(sq.Eq{"resource_type": resourceType})
+	q.updater = q.updater.Where(sq.Eq{"resource_type": resourceType})
 	return q
 }
 

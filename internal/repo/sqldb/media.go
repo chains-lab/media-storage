@@ -8,22 +8,18 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
-	"github.com/hs-zavet/media-storage/internal/enums"
 )
 
 const mediaTable = "media"
 
 type MediaModel struct {
-	Filename uuid.UUID `db:"filename"`
-	Ext      string    `db:"ext"`
-	Folder   string    `db:"folder"`
-
-	ResourceType enums.ResourceType `db:"resource_type"`
-	ResourceID   uuid.UUID          `db:"resource_id"`
-	MediaType    enums.MediaType    `db:"media_type"`
-	OwnerID      uuid.UUID          `db:"owner_id,omitempty"`
-	UpdatedAt    time.Time          `db:"updated_at"`
-	CreatedAt    time.Time          `db:"created_at"`
+	Filename     uuid.UUID `db:"filename"`
+	Ext          string    `db:"ext"`
+	ResourceType string    `db:"resource_type"`
+	ResourceID   uuid.UUID `db:"resource_id"`
+	OwnerID      uuid.UUID `db:"owner_id,omitempty"`
+	UpdatedAt    time.Time `db:"updated_at"`
+	CreatedAt    time.Time `db:"created_at"`
 }
 
 type MediaQ struct {
@@ -52,25 +48,21 @@ func (q MediaQ) New() MediaQ {
 }
 
 type MediaInsertInput struct {
-	Filename     uuid.UUID          `db:"filename"`
-	Folder       string             `db:"folder"`
-	Ext          string             `db:"extension"`
-	ResourceType enums.ResourceType `db:"resource_type"`
-	ResourceID   uuid.UUID          `db:"resource_id"`
-	MediaType    enums.MediaType    `db:"media_type"`
-	OwnerID      uuid.UUID          `db:"owner_id,"`
-	UpdatedAt    time.Time          `db:"updated_at"`
-	CreatedAt    time.Time          `db:"created_at"`
+	Filename     uuid.UUID `db:"filename"`
+	Ext          string    `db:"extension"`
+	ResourceType string    `db:"resource_type"`
+	ResourceID   uuid.UUID `db:"resource_id"`
+	OwnerID      uuid.UUID `db:"owner_id,"`
+	UpdatedAt    time.Time `db:"updated_at"`
+	CreatedAt    time.Time `db:"created_at"`
 }
 
 func (q MediaQ) Insert(ctx context.Context, input MediaInsertInput) (MediaModel, error) {
 	values := map[string]any{
 		"filename":      input.Filename,
-		"folder":        input.Folder,
 		"extension":     input.Ext,
 		"resource_type": input.ResourceType,
 		"resource_id":   input.ResourceID,
-		"media_type":    input.MediaType,
 		"owner_id":      input.OwnerID,
 		"updated_at":    input.UpdatedAt,
 		"created_at":    input.CreatedAt,
@@ -93,11 +85,9 @@ func (q MediaQ) Insert(ctx context.Context, input MediaInsertInput) (MediaModel,
 
 	res := MediaModel{
 		Filename:     input.Filename,
-		Folder:       input.Folder,
 		Ext:          input.Ext,
 		ResourceType: input.ResourceType,
 		ResourceID:   input.ResourceID,
-		MediaType:    input.MediaType,
 		OwnerID:      input.OwnerID,
 		UpdatedAt:    input.UpdatedAt,
 		CreatedAt:    input.CreatedAt,
@@ -133,11 +123,9 @@ func (q MediaQ) Get(ctx context.Context) (MediaModel, error) {
 	var m MediaModel
 	err = q.db.QueryRowContext(ctx, query, args...).Scan(
 		&m.Filename,
-		&m.Folder,
 		&m.Ext,
 		&m.ResourceType,
 		&m.ResourceID,
-		&m.MediaType,
 		&m.OwnerID,
 		&m.CreatedAt,
 	)
@@ -165,11 +153,9 @@ func (q MediaQ) Select(ctx context.Context) ([]MediaModel, error) {
 		var m MediaModel
 		err := rows.Scan(
 			&m.Filename,
-			&m.Folder,
 			&m.Ext,
 			&m.ResourceType,
 			&m.ResourceID,
-			&m.MediaType,
 			&m.OwnerID,
 			&m.UpdatedAt,
 			&m.CreatedAt,
@@ -191,11 +177,11 @@ func (q MediaQ) FilterFilename(name uuid.UUID) MediaQ {
 	return q
 }
 
-func (q MediaQ) FilterFolder(folder string) MediaQ {
-	q.selector = q.selector.Where(sq.Eq{"folder": folder})
-	q.counter = q.counter.Where(sq.Eq{"folder": folder})
-	q.deleter = q.deleter.Where(sq.Eq{"folder": folder})
-	q.updater = q.updater.Where(sq.Eq{"folder": folder})
+func (q MediaQ) FilterResourceType(resourceType string) MediaQ {
+	q.selector = q.selector.Where(sq.Eq{"resource_type": resourceType})
+	q.counter = q.counter.Where(sq.Eq{"resource_type": resourceType})
+	q.deleter = q.deleter.Where(sq.Eq{"resource_type": resourceType})
+	q.updater = q.updater.Where(sq.Eq{"resource_type": resourceType})
 	return q
 }
 

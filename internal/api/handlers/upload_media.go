@@ -13,7 +13,6 @@ import (
 	"github.com/hs-zavet/media-storage/internal/api/responses"
 	"github.com/hs-zavet/media-storage/internal/app"
 	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/media-storage/internal/enums"
 	"github.com/hs-zavet/tokens"
 )
 
@@ -32,23 +31,7 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourcesType, err := enums.ParseResourceType(chi.URLParam(r, "media_resource_type"))
-	if err != nil {
-		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"media_resource_type": validation.NewError("media_resource_type", "invalid resource type"),
-		})...)
-		return
-	}
-
-	mediaType, err := enums.ParseMediaType(req.Data.Attributes.MediaType)
-	if err != nil {
-		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"content_type": validation.NewError("media_type", "invalid content type"),
-		})...)
-		return
-	}
+	resourcesType := chi.URLParam(r, "resource_type")
 
 	ResourcesID, err := uuid.Parse(req.Data.Attributes.ResourceId)
 	if err != nil {
@@ -62,7 +45,6 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	requestToApp := app.UploadMediaRequest{
 		ResourceType: resourcesType,
 		ResourceID:   ResourcesID,
-		MediaType:    mediaType,
 		User:         user,
 		File:         file,
 		FileHeader:   fileHeader,
@@ -74,7 +56,6 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, ape.ErrMediaNotFound):
 			httpkit.RenderErr(w, problems.NotFound("media not found"))
 		case errors.Is(err, ape.ErrMediaRulesNotFound):
-			//TODO: check if this is the right error
 			httpkit.RenderErr(w, problems.NotFound("media rules for this media type not found"))
 		case errors.Is(err, ape.ErrFileToLarge):
 			httpkit.RenderErr(w, problems.BadRequest(validation.Errors{

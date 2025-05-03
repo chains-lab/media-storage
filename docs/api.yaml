@@ -39,3 +39,6 @@ components:
       $ref: './spec/components/schemas/UpdateMediaRules.yaml'
     MediaRulesCollection:
       $ref: './spec/components/schemas/MediaRulesCollection.yaml'
+
+    ExitSize:
+      $ref: './spec/components/schemas/ExitSize.yaml'

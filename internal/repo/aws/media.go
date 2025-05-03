@@ -17,17 +17,17 @@ import (
 )
 
 type MediaModel struct {
-	Filename uuid.UUID
-	Folder   string
-	Ext      string
-	Size     int64
-	URL      string
+	Filename     uuid.UUID
+	ResourceType string
+	Ext          string
+	Size         int64
+	URL          string
 }
 
 type FileData struct {
-	Filename uuid.UUID
-	Folder   string
-	Ext      string
+	Filename     uuid.UUID
+	ResourceType string
+	Ext          string
 }
 
 type S3Client struct {
@@ -55,7 +55,7 @@ func NewAwsS3Client(bucket, region, accessKeyID, secretAccessKey string) (*S3Cli
 }
 
 func (s *S3Client) AddFile(ctx context.Context, fileData FileData, reader io.Reader) (MediaModel, error) {
-	key := path.Join(fileData.Folder, fileData.Filename.String()+fileData.Ext)
+	key := path.Join(fileData.ResourceType, fileData.Filename.String()+fileData.Ext)
 
 	ct := mime.TypeByExtension(fileData.Ext)
 	if ct == "" {
@@ -83,15 +83,15 @@ func (s *S3Client) AddFile(ctx context.Context, fileData FileData, reader io.Rea
 	size := aws.ToInt64(head.ContentLength)
 	url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", s.bucket, s.region, key)
 	return MediaModel{
-		Filename: fileData.Filename,
-		Folder:   fileData.Folder,
-		URL:      url,
-		Size:     size,
+		Filename:     fileData.Filename,
+		ResourceType: fileData.ResourceType,
+		URL:          url,
+		Size:         size,
 	}, nil
 }
 
 func (s *S3Client) GetFile(ctx context.Context, fileData FileData) (MediaModel, error) {
-	key := path.Join(fileData.Folder, fileData.Filename.String()+fileData.Ext)
+	key := path.Join(fileData.ResourceType, fileData.Filename.String()+fileData.Ext)
 	head, err := s.client.HeadObject(ctx, &s3.HeadObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(key),
@@ -103,16 +103,16 @@ func (s *S3Client) GetFile(ctx context.Context, fileData FileData) (MediaModel, 
 	size := aws.ToInt64(head.ContentLength)
 	url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", s.bucket, s.region, key)
 	return MediaModel{
-		Filename: fileData.Filename,
-		Folder:   fileData.Folder,
-		Ext:      fileData.Ext,
-		URL:      url,
-		Size:     size,
+		Filename:     fileData.Filename,
+		ResourceType: fileData.ResourceType,
+		Ext:          fileData.Ext,
+		URL:          url,
+		Size:         size,
 	}, nil
 }
 
 func (s *S3Client) DeleteFile(ctx context.Context, fileData FileData) error {
-	name := path.Join(fileData.Folder, fileData.Filename.String()+fileData.Ext)
+	name := path.Join(fileData.ResourceType, fileData.Filename.String()+fileData.Ext)
 	_, err := s.client.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(name),
@@ -123,11 +123,11 @@ func (s *S3Client) DeleteFile(ctx context.Context, fileData FileData) error {
 	return nil
 }
 
-func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit uint) ([]MediaModel, error) {
+func (s *S3Client) ListFiles(ctx context.Context, ResourceType string, offset, limit uint) ([]MediaModel, error) {
 	var results []MediaModel
 	input := &s3.ListObjectsV2Input{
 		Bucket: aws.String(s.bucket),
-		Prefix: aws.String(folder + "/"),
+		Prefix: aws.String(ResourceType + "/"),
 	}
 	paginator := s3.NewListObjectsV2Paginator(s.client, input)
 	count := uint(0)
@@ -172,11 +172,11 @@ func (s *S3Client) ListFiles(ctx context.Context, folder string, offset, limit u
 
 			url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", s.bucket, s.region, key)
 			results = append(results, MediaModel{
-				Filename: fileID,
-				Folder:   folder,
-				Ext:      ext,
-				URL:      url,
-				Size:     aws.ToInt64(obj.Size),
+				Filename:     fileID,
+				ResourceType: ResourceType,
+				Ext:          ext,
+				URL:          url,
+				Size:         aws.ToInt64(obj.Size),
 			})
 		}
 	}

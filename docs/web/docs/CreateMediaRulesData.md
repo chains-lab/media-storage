@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | media type | 
+**Id** | **string** | media resource type | 
 **Type** | **string** |  | 
 **Attributes** | [**CreateMediaRulesDataAttributes**](CreateMediaRulesDataAttributes.md) |  | 
 

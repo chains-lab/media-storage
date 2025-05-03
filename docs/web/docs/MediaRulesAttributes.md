@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**MaxSize** | **int64** | Maximum file size in bytes | 
-**AllowedExits** | **[]string** |  | 
-**Folder** | **string** | Folder where the media is stored | 
+**ExitSize** | [**[]ExitSizeInner**](ExitSizeInner.md) |  | 
 **Roles** | **[]string** |  | 
+**UpdatedAt** | **time.Time** | Date and time when the media rules were last updated | 
+**CreatedAt** | **time.Time** | Date and time when the media rules were created | 
 
 ## Methods
 
 ### NewMediaRulesAttributes
 
-`func NewMediaRulesAttributes(maxSize int64, allowedExits []string, folder string, roles []string, ) *MediaRulesAttributes`
+`func NewMediaRulesAttributes(exitSize []ExitSizeInner, roles []string, updatedAt time.Time, createdAt time.Time, ) *MediaRulesAttributes`
 
 NewMediaRulesAttributes instantiates a new MediaRulesAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -28,64 +28,24 @@ NewMediaRulesAttributesWithDefaults instantiates a new MediaRulesAttributes obje
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetMaxSize
+### GetExitSize
 
-`func (o *MediaRulesAttributes) GetMaxSize() int64`
+`func (o *MediaRulesAttributes) GetExitSize() []ExitSizeInner`
 
-GetMaxSize returns the MaxSize field if non-nil, zero value otherwise.
+GetExitSize returns the ExitSize field if non-nil, zero value otherwise.
 
-### GetMaxSizeOk
+### GetExitSizeOk
 
-`func (o *MediaRulesAttributes) GetMaxSizeOk() (*int64, bool)`
+`func (o *MediaRulesAttributes) GetExitSizeOk() (*[]ExitSizeInner, bool)`
 
-GetMaxSizeOk returns a tuple with the MaxSize field if it's non-nil, zero value otherwise
+GetExitSizeOk returns a tuple with the ExitSize field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetMaxSize
+### SetExitSize
 
-`func (o *MediaRulesAttributes) SetMaxSize(v int64)`
+`func (o *MediaRulesAttributes) SetExitSize(v []ExitSizeInner)`
 
-SetMaxSize sets MaxSize field to given value.
-
-
-### GetAllowedExits
-
-`func (o *MediaRulesAttributes) GetAllowedExits() []string`
-
-GetAllowedExits returns the AllowedExits field if non-nil, zero value otherwise.
-
-### GetAllowedExitsOk
-
-`func (o *MediaRulesAttributes) GetAllowedExitsOk() (*[]string, bool)`
-
-GetAllowedExitsOk returns a tuple with the AllowedExits field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetAllowedExits
-
-`func (o *MediaRulesAttributes) SetAllowedExits(v []string)`
-
-SetAllowedExits sets AllowedExits field to given value.
-
-
-### GetFolder
-
-`func (o *MediaRulesAttributes) GetFolder() string`
-
-GetFolder returns the Folder field if non-nil, zero value otherwise.
-
-### GetFolderOk
-
-`func (o *MediaRulesAttributes) GetFolderOk() (*string, bool)`
-
-GetFolderOk returns a tuple with the Folder field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetFolder
-
-`func (o *MediaRulesAttributes) SetFolder(v string)`
-
-SetFolder sets Folder field to given value.
+SetExitSize sets ExitSize field to given value.
 
 
 ### GetRoles
@@ -106,6 +66,46 @@ and a boolean to check if the value has been set.
 `func (o *MediaRulesAttributes) SetRoles(v []string)`
 
 SetRoles sets Roles field to given value.
+
+
+### GetUpdatedAt
+
+`func (o *MediaRulesAttributes) GetUpdatedAt() time.Time`
+
+GetUpdatedAt returns the UpdatedAt field if non-nil, zero value otherwise.
+
+### GetUpdatedAtOk
+
+`func (o *MediaRulesAttributes) GetUpdatedAtOk() (*time.Time, bool)`
+
+GetUpdatedAtOk returns a tuple with the UpdatedAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUpdatedAt
+
+`func (o *MediaRulesAttributes) SetUpdatedAt(v time.Time)`
+
+SetUpdatedAt sets UpdatedAt field to given value.
+
+
+### GetCreatedAt
+
+`func (o *MediaRulesAttributes) GetCreatedAt() time.Time`
+
+GetCreatedAt returns the CreatedAt field if non-nil, zero value otherwise.
+
+### GetCreatedAtOk
+
+`func (o *MediaRulesAttributes) GetCreatedAtOk() (*time.Time, bool)`
+
+GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCreatedAt
+
+`func (o *MediaRulesAttributes) SetCreatedAt(v time.Time)`
+
+SetCreatedAt sets CreatedAt field to given value.
 
 
 

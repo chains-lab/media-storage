@@ -7,7 +7,6 @@ import (
 	"github.com/hs-zavet/media-storage/internal/app"
 	"github.com/hs-zavet/media-storage/internal/app/models"
 	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/media-storage/internal/enums"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,10 +15,10 @@ type App interface {
 	UploadMedia(ctx context.Context, request app.UploadMediaRequest) (models.Media, error)
 	DeleteMedia(ctx context.Context, request app.DeleteMediaRequest) error
 
-	CreateMediaRules(ctx context.Context, request app.CreateMediaRulesRequest) (models.MediaRules, error)
-	GetMediaRules(ctx context.Context, mediaType enums.MediaType) (models.MediaRules, error)
-	UpdateMediaRules(ctx context.Context, mType enums.MediaType, request app.UpdateMediaRulesRequest) (models.MediaRules, error)
-	DeleteMediaRules(ctx context.Context, mType enums.MediaType) error
+	CreateMediaRules(ctx context.Context, resourceTpe string, request app.CreateMediaRulesRequest) (models.MediaRules, error)
+	GetMediaRules(ctx context.Context, resourceTpe string) (models.MediaRules, error)
+	UpdateMediaRules(ctx context.Context, resourceTpe string, request app.UpdateMediaRulesRequest) (models.MediaRules, error)
+	DeleteMediaRules(ctx context.Context, resourceTpe string) error
 }
 
 type Handler struct {

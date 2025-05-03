@@ -4,16 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**MaxSize** | **int64** | Maximum file size in bytes | 
-**AllowedExits** | **[]string** |  | 
-**Folder** | **string** | Folder where the media is stored | 
+**ExitSize** | [**[]ExitSizeInner**](ExitSizeInner.md) |  | 
 **Roles** | **[]string** |  | 
 
 ## Methods
 
 ### NewCreateMediaRulesDataAttributes
 
-`func NewCreateMediaRulesDataAttributes(maxSize int64, allowedExits []string, folder string, roles []string, ) *CreateMediaRulesDataAttributes`
+`func NewCreateMediaRulesDataAttributes(exitSize []ExitSizeInner, roles []string, ) *CreateMediaRulesDataAttributes`
 
 NewCreateMediaRulesDataAttributes instantiates a new CreateMediaRulesDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -28,64 +26,24 @@ NewCreateMediaRulesDataAttributesWithDefaults instantiates a new CreateMediaRule
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetMaxSize
+### GetExitSize
 
-`func (o *CreateMediaRulesDataAttributes) GetMaxSize() int64`
+`func (o *CreateMediaRulesDataAttributes) GetExitSize() []ExitSizeInner`
 
-GetMaxSize returns the MaxSize field if non-nil, zero value otherwise.
+GetExitSize returns the ExitSize field if non-nil, zero value otherwise.
 
-### GetMaxSizeOk
+### GetExitSizeOk
 
-`func (o *CreateMediaRulesDataAttributes) GetMaxSizeOk() (*int64, bool)`
+`func (o *CreateMediaRulesDataAttributes) GetExitSizeOk() (*[]ExitSizeInner, bool)`
 
-GetMaxSizeOk returns a tuple with the MaxSize field if it's non-nil, zero value otherwise
+GetExitSizeOk returns a tuple with the ExitSize field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetMaxSize
+### SetExitSize
 
-`func (o *CreateMediaRulesDataAttributes) SetMaxSize(v int64)`
+`func (o *CreateMediaRulesDataAttributes) SetExitSize(v []ExitSizeInner)`
 
-SetMaxSize sets MaxSize field to given value.
-
-
-### GetAllowedExits
-
-`func (o *CreateMediaRulesDataAttributes) GetAllowedExits() []string`
-
-GetAllowedExits returns the AllowedExits field if non-nil, zero value otherwise.
-
-### GetAllowedExitsOk
-
-`func (o *CreateMediaRulesDataAttributes) GetAllowedExitsOk() (*[]string, bool)`
-
-GetAllowedExitsOk returns a tuple with the AllowedExits field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetAllowedExits
-
-`func (o *CreateMediaRulesDataAttributes) SetAllowedExits(v []string)`
-
-SetAllowedExits sets AllowedExits field to given value.
-
-
-### GetFolder
-
-`func (o *CreateMediaRulesDataAttributes) GetFolder() string`
-
-GetFolder returns the Folder field if non-nil, zero value otherwise.
-
-### GetFolderOk
-
-`func (o *CreateMediaRulesDataAttributes) GetFolderOk() (*string, bool)`
-
-GetFolderOk returns a tuple with the Folder field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetFolder
-
-`func (o *CreateMediaRulesDataAttributes) SetFolder(v string)`
-
-SetFolder sets Folder field to given value.
+SetExitSize sets ExitSize field to given value.
 
 
 ### GetRoles

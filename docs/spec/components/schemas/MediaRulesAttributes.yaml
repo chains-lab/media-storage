@@ -1,27 +1,24 @@
 type: object
 required:
-  - max_size
-  - allowed_exits
-  - folder
+  - exit_size
   - roles
+  - updated_at
+  - created_at
 properties:
-  max_size:
-    type: integer
-    format: int64
-    description: "Maximum file size in bytes"
-  allowed_exits:
-    type: array
-    items:
-      type: string
-      example: [".jpg", ".png"]
-      description: "Allowed exits for the media"
-  folder:
-    type: string
-    description: "Folder where the media is stored"
+  exit_size:
+    $ref: './ExitSize.yaml'
   roles:
     type: array
     items:
       type: string
       enum: [ admin, user ]
       description: "Roles that can access the media"
+  updated_at:
+    type: string
+    format: date-time
+    description: "Date and time when the media rules were last updated"
+  created_at:
+    type: string
+    format: date-time
+    description: "Date and time when the media rules were created"
 

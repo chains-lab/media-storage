@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/media-storage/internal/enums"
 	"github.com/hs-zavet/media-storage/internal/repo/aws"
 	"github.com/hs-zavet/media-storage/internal/repo/sqldb"
 )
@@ -19,16 +18,14 @@ const (
 )
 
 type MediaModel struct {
-	ID           uuid.UUID          `db:"id"`
-	Folder       string             `db:"folder"`
-	Ext          string             `db:"extension"`
-	Size         int64              `db:"size"`
-	URL          string             `db:"url"`
-	ResourceType enums.ResourceType `db:"resource_type"`
-	ResourceID   uuid.UUID          `db:"resource_id"`
-	MediaType    enums.MediaType    `db:"media_type"`
-	OwnerID      uuid.UUID          `db:"owner_id"`
-	CreatedAt    time.Time          `db:"created_at"`
+	ID           uuid.UUID `db:"id"`
+	Ext          string    `db:"extension"`
+	Size         int64     `db:"size"`
+	URL          string    `db:"url"`
+	ResourceType string    `db:"resource_type"`
+	ResourceID   uuid.UUID `db:"resource_id"`
+	OwnerID      uuid.UUID `db:"owner_id"`
+	CreatedAt    time.Time `db:"created_at"`
 }
 
 type mediaAws interface {
@@ -48,7 +45,7 @@ type mediaSQL interface {
 	Get(ctx context.Context) (sqldb.MediaModel, error)
 
 	FilterFilename(id uuid.UUID) sqldb.MediaQ
-	FilterFolder(folder string) sqldb.MediaQ
+	FilterResourceType(resourceType string) sqldb.MediaQ
 
 	Count(ctx context.Context) (int, error)
 	Transaction(fn func(ctx context.Context) error) error
@@ -78,12 +75,10 @@ func NewMedia(cfg config.Config) (MediaRepo, error) {
 }
 
 type AddMediaInput struct {
-	Folder       string
 	Filename     uuid.UUID
 	Ext          string
-	ResourceType enums.ResourceType
+	ResourceType string
 	ResourceID   uuid.UUID
-	MediaType    enums.MediaType
 	OwnerID      uuid.UUID
 	CreatedAt    time.Time
 }
@@ -91,11 +86,9 @@ type AddMediaInput struct {
 func (r MediaRepo) AddMedia(ctx context.Context, reader io.Reader, input AddMediaInput) (MediaModel, error) {
 	sqlInput := sqldb.MediaInsertInput{
 		Filename:     input.Filename,
-		Folder:       input.Folder,
 		Ext:          input.Ext,
 		ResourceType: input.ResourceType,
 		ResourceID:   input.ResourceID,
-		MediaType:    input.MediaType,
 		CreatedAt:    input.CreatedAt,
 		OwnerID:      input.OwnerID,
 	}
@@ -106,9 +99,9 @@ func (r MediaRepo) AddMedia(ctx context.Context, reader io.Reader, input AddMedi
 	}
 
 	resAsw, err := r.s3.AddFile(ctx, aws.FileData{
-		Folder:   input.Folder,
-		Filename: input.Filename,
-		Ext:      input.Ext,
+		ResourceType: input.ResourceType,
+		Filename:     input.Filename,
+		Ext:          input.Ext,
 	}, reader)
 	if err != nil {
 		return MediaModel{}, fmt.Errorf("s3 upload failed: %w", err)
@@ -123,7 +116,7 @@ func (r MediaRepo) GetMedia(ctx context.Context, filename uuid.UUID) (MediaModel
 		return MediaModel{}, fmt.Errorf("sql get: %w", err)
 	}
 
-	s3Media, err := r.s3.ListFiles(ctx, sqlMedia.Folder, 0, 1)
+	s3Media, err := r.s3.ListFiles(ctx, sqlMedia.ResourceType, 0, 1)
 	if err != nil {
 		return MediaModel{}, fmt.Errorf("s3 list: %w", err)
 	}
@@ -142,9 +135,9 @@ func (r MediaRepo) DeleteMedia(ctx context.Context, fileId uuid.UUID) error {
 	}
 
 	err = r.s3.DeleteFile(ctx, aws.FileData{
-		Folder:   media.Folder,
-		Filename: fileId,
-		Ext:      media.Ext,
+		ResourceType: media.ResourceType,
+		Filename:     fileId,
+		Ext:          media.Ext,
 	})
 	if err != nil {
 		return fmt.Errorf("s3 delete: %w", err)
@@ -161,27 +154,25 @@ func (r MediaRepo) DeleteMedia(ctx context.Context, fileId uuid.UUID) error {
 func createMediaModel(sql sqldb.MediaModel, aws aws.MediaModel) MediaModel {
 	res := MediaModel{
 		ID:           sql.Filename,
-		Folder:       sql.Folder,
 		Ext:          sql.Ext,
 		Size:         aws.Size,
 		URL:          aws.URL,
 		OwnerID:      sql.OwnerID,
 		ResourceType: sql.ResourceType,
 		ResourceID:   sql.ResourceID,
-		MediaType:    sql.MediaType,
 		CreatedAt:    sql.CreatedAt,
 	}
 
 	return res
 }
 
-func (r MediaRepo) DeleteFilesByPrefix(ctx context.Context, prefix string) error {
-	err := r.s3.DeleteFilesByPrefix(ctx, prefix)
+func (r MediaRepo) DeleteFilesByResourceType(ctx context.Context, resourceType string) error {
+	err := r.s3.DeleteFilesByPrefix(ctx, resourceType)
 	if err != nil {
 		return fmt.Errorf("s3 delete by prefix: %w", err)
 	}
 
-	err = r.sql.New().FilterFolder(prefix).Delete(ctx)
+	err = r.sql.New().FilterResourceType(resourceType).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("sql delete by prefix: %w", err)
 	}

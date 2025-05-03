@@ -9,18 +9,12 @@ import (
 	"github.com/hs-zavet/comtools/httpkit/problems"
 	"github.com/hs-zavet/media-storage/internal/api/responses"
 	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/media-storage/internal/enums"
 )
 
 func (h *Handler) GetMediaRules(w http.ResponseWriter, r *http.Request) {
-	mediaResourceType, err := enums.ParseMediaType(chi.URLParam(r, "media_resource_type"))
-	if err != nil {
-		h.log.WithError(err).Warn("Error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(err)...)
-		return
-	}
+	resourceType := chi.URLParam(r, "resource_type")
 
-	res, err := h.app.GetMediaRules(r.Context(), mediaResourceType)
+	res, err := h.app.GetMediaRules(r.Context(), resourceType)
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaRulesNotFound):

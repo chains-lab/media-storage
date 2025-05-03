@@ -11,15 +11,23 @@ func MediaRules(mediaRules models.MediaRules) resources.MediaRules {
 		roles = append(roles, string(role))
 	}
 
+	exitSize := make([]resources.ExitSizeInner, 0, len(mediaRules.ExitSize))
+	for _, el := range mediaRules.ExitSize {
+		exitSize = append(exitSize, resources.ExitSizeInner{
+			Exit: el.Exit,
+			Size: el.Size,
+		})
+	}
+
 	return resources.MediaRules{
 		Data: resources.MediaRulesData{
 			Type: resources.MediaRulesCollectionType,
-			Id:   string(mediaRules.MediaType),
+			Id:   mediaRules.ResourceType,
 			Attributes: resources.MediaRulesAttributes{
-				MaxSize:      mediaRules.MaxSize,
-				AllowedExits: mediaRules.AllowedExits,
-				Folder:       mediaRules.Folder,
-				Roles:        roles,
+				ExitSize:  exitSize,
+				Roles:     roles,
+				UpdatedAt: mediaRules.UpdatedAt,
+				CreatedAt: mediaRules.CreatedAt,
 			},
 		},
 	}

@@ -28,6 +28,7 @@ func UploadMedia(r *http.Request) (req resources.UploadMedia, file multipart.Fil
 	}
 	raw = []byte(r.FormValue("upload_data"))
 	fmt.Printf(">>> RAW UPLOAD_DATA = %q\n", raw)
+
 	file, fileHeader, err = r.FormFile("file")
 	if err != nil {
 		err = fmt.Errorf("read uploaded file: %w", err)

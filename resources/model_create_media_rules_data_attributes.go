@@ -21,11 +21,7 @@ var _ MappedNullable = &CreateMediaRulesDataAttributes{}
 
 // CreateMediaRulesDataAttributes struct for CreateMediaRulesDataAttributes
 type CreateMediaRulesDataAttributes struct {
-	// Maximum file size in bytes
-	MaxSize int64 `json:"max_size"`
-	AllowedExits []string `json:"allowed_exits"`
-	// Folder where the media is stored
-	Folder string `json:"folder"`
+	ExitSize []ExitSizeInner `json:"exit_size"`
 	Roles []string `json:"roles"`
 }
 
@@ -35,11 +31,9 @@ type _CreateMediaRulesDataAttributes CreateMediaRulesDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCreateMediaRulesDataAttributes(maxSize int64, allowedExits []string, folder string, roles []string) *CreateMediaRulesDataAttributes {
+func NewCreateMediaRulesDataAttributes(exitSize []ExitSizeInner, roles []string) *CreateMediaRulesDataAttributes {
 	this := CreateMediaRulesDataAttributes{}
-	this.MaxSize = maxSize
-	this.AllowedExits = allowedExits
-	this.Folder = folder
+	this.ExitSize = exitSize
 	this.Roles = roles
 	return &this
 }
@@ -52,76 +46,28 @@ func NewCreateMediaRulesDataAttributesWithDefaults() *CreateMediaRulesDataAttrib
 	return &this
 }
 
-// GetMaxSize returns the MaxSize field value
-func (o *CreateMediaRulesDataAttributes) GetMaxSize() int64 {
+// GetExitSize returns the ExitSize field value
+func (o *CreateMediaRulesDataAttributes) GetExitSize() []ExitSizeInner {
 	if o == nil {
-		var ret int64
+		var ret []ExitSizeInner
 		return ret
 	}
 
-	return o.MaxSize
+	return o.ExitSize
 }
 
-// GetMaxSizeOk returns a tuple with the MaxSize field value
+// GetExitSizeOk returns a tuple with the ExitSize field value
 // and a boolean to check if the value has been set.
-func (o *CreateMediaRulesDataAttributes) GetMaxSizeOk() (*int64, bool) {
+func (o *CreateMediaRulesDataAttributes) GetExitSizeOk() ([]ExitSizeInner, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.MaxSize, true
+	return o.ExitSize, true
 }
 
-// SetMaxSize sets field value
-func (o *CreateMediaRulesDataAttributes) SetMaxSize(v int64) {
-	o.MaxSize = v
-}
-
-// GetAllowedExits returns the AllowedExits field value
-func (o *CreateMediaRulesDataAttributes) GetAllowedExits() []string {
-	if o == nil {
-		var ret []string
-		return ret
-	}
-
-	return o.AllowedExits
-}
-
-// GetAllowedExitsOk returns a tuple with the AllowedExits field value
-// and a boolean to check if the value has been set.
-func (o *CreateMediaRulesDataAttributes) GetAllowedExitsOk() ([]string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return o.AllowedExits, true
-}
-
-// SetAllowedExits sets field value
-func (o *CreateMediaRulesDataAttributes) SetAllowedExits(v []string) {
-	o.AllowedExits = v
-}
-
-// GetFolder returns the Folder field value
-func (o *CreateMediaRulesDataAttributes) GetFolder() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Folder
-}
-
-// GetFolderOk returns a tuple with the Folder field value
-// and a boolean to check if the value has been set.
-func (o *CreateMediaRulesDataAttributes) GetFolderOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Folder, true
-}
-
-// SetFolder sets field value
-func (o *CreateMediaRulesDataAttributes) SetFolder(v string) {
-	o.Folder = v
+// SetExitSize sets field value
+func (o *CreateMediaRulesDataAttributes) SetExitSize(v []ExitSizeInner) {
+	o.ExitSize = v
 }
 
 // GetRoles returns the Roles field value
@@ -158,9 +104,7 @@ func (o CreateMediaRulesDataAttributes) MarshalJSON() ([]byte, error) {
 
 func (o CreateMediaRulesDataAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["max_size"] = o.MaxSize
-	toSerialize["allowed_exits"] = o.AllowedExits
-	toSerialize["folder"] = o.Folder
+	toSerialize["exit_size"] = o.ExitSize
 	toSerialize["roles"] = o.Roles
 	return toSerialize, nil
 }
@@ -170,9 +114,7 @@ func (o *CreateMediaRulesDataAttributes) UnmarshalJSON(data []byte) (err error) 
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"max_size",
-		"allowed_exits",
-		"folder",
+		"exit_size",
 		"roles",
 	}
 

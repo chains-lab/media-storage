@@ -128,7 +128,7 @@ components:
       properties:
         id:
           type: string
-          description: media type
+          description: media resource type
         type:
           type: string
           enum:
@@ -138,26 +138,13 @@ components:
     MediaRulesAttributes:
       type: object
       required:
-        - max_size
-        - allowed_exits
-        - folder
+        - exit_size
         - roles
+        - updated_at
+        - created_at
       properties:
-        max_size:
-          type: integer
-          format: int64
-          description: Maximum file size in bytes
-        allowed_exits:
-          type: array
-          items:
-            type: string
-            example:
-              - .jpg
-              - .png
-            description: Allowed exits for the media
-        folder:
-          type: string
-          description: Folder where the media is stored
+        exit_size:
+          $ref: '#/components/schemas/ExitSize'
         roles:
           type: array
           items:
@@ -166,6 +153,14 @@ components:
               - admin
               - user
             description: Roles that can access the media
+        updated_at:
+          type: string
+          format: date-time
+          description: Date and time when the media rules were last updated
+        created_at:
+          type: string
+          format: date-time
+          description: Date and time when the media rules were created
     CreateMediaRules:
       type: object
       required:
@@ -180,34 +175,19 @@ components:
           properties:
             id:
               type: string
-              description: media type
+              description: media resource type
             type:
               type: string
               enum:
-                - media_rules_create
+                - create_media_rules
             attributes:
               type: object
               required:
-                - max_size
-                - allowed_exits
-                - folder
+                - exit_size
                 - roles
               properties:
-                max_size:
-                  type: integer
-                  format: int64
-                  description: Maximum file size in bytes
-                allowed_exits:
-                  type: array
-                  items:
-                    type: string
-                    example:
-                      - .jpg
-                      - .png
-                    description: Allowed exits for the media
-                folder:
-                  type: string
-                  description: Folder where the media is stored
+                exit_size:
+                  $ref: '#/components/schemas/ExitSize'
                 roles:
                   type: array
                   items:
@@ -230,29 +210,19 @@ components:
           properties:
             id:
               type: string
-              description: media type
+              description: media resource type
             type:
               type: string
               enum:
-                - media_rules_update
+                - update_media_rules
             attributes:
               type: object
+              required:
+                - exit_size
+                - roles
               properties:
-                max_size:
-                  type: integer
-                  format: int64
-                  description: Maximum file size in bytes
-                allowed_exits:
-                  type: array
-                  items:
-                    type: string
-                    example:
-                      - .jpg
-                      - .png
-                    description: Allowed exits for the media
-                folder:
-                  type: string
-                  description: Folder where the media is stored
+                exit_size:
+                  $ref: '#/components/schemas/ExitSize'
                 roles:
                   type: array
                   items:
@@ -286,3 +256,18 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/MediaData'
+    ExitSize:
+      type: array
+      items:
+        type: object
+        required:
+          - exit
+          - size
+        properties:
+          exit:
+            type: string
+            description: exit name
+          size:
+            type: integer
+            format: int64
+            description: exit size
