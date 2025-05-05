@@ -6,7 +6,7 @@ required:
 properties:
   id:
     type: string
-    description: "media resource type"
+    description: "media rules id"
   type:
     type: string
     enum: [ media_rules ]

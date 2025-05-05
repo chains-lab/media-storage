@@ -11,24 +11,28 @@ properties:
     properties:
       id:
         type: string
-        description: "media resource type"
+        description: "media rules id"
       type:
         type: string
         enum: [ update_media_rules ]
       attributes:
         type: object
-        required:
-          - exit_size
-          - roles
         properties:
-          exit_size:
-            $ref: './ExitSize.yaml'
+          extensions:
+            type: array
+            items:
+              type: string
+              description: "Indicates if the media is exit size"
+          max_size:
+            type: integer
+            format: int64
+            description: "Maximum size of the media in bytes"
           roles:
             type: array
             items:
               type: string
-              enum: [ admin, user ]
-              description: "Roles that can access the media"
+              description: "Roles associated with the media rules"
+
 
 
 

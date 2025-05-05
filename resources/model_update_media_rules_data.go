@@ -21,10 +21,10 @@ var _ MappedNullable = &UpdateMediaRulesData{}
 
 // UpdateMediaRulesData struct for UpdateMediaRulesData
 type UpdateMediaRulesData struct {
-	// media resource type
+	// media rules id
 	Id string `json:"id"`
 	Type string `json:"type"`
-	Attributes CreateMediaRulesDataAttributes `json:"attributes"`
+	Attributes UpdateMediaRulesDataAttributes `json:"attributes"`
 }
 
 type _UpdateMediaRulesData UpdateMediaRulesData
@@ -33,7 +33,7 @@ type _UpdateMediaRulesData UpdateMediaRulesData
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUpdateMediaRulesData(id string, type_ string, attributes CreateMediaRulesDataAttributes) *UpdateMediaRulesData {
+func NewUpdateMediaRulesData(id string, type_ string, attributes UpdateMediaRulesDataAttributes) *UpdateMediaRulesData {
 	this := UpdateMediaRulesData{}
 	this.Id = id
 	this.Type = type_
@@ -98,9 +98,9 @@ func (o *UpdateMediaRulesData) SetType(v string) {
 }
 
 // GetAttributes returns the Attributes field value
-func (o *UpdateMediaRulesData) GetAttributes() CreateMediaRulesDataAttributes {
+func (o *UpdateMediaRulesData) GetAttributes() UpdateMediaRulesDataAttributes {
 	if o == nil {
-		var ret CreateMediaRulesDataAttributes
+		var ret UpdateMediaRulesDataAttributes
 		return ret
 	}
 
@@ -109,7 +109,7 @@ func (o *UpdateMediaRulesData) GetAttributes() CreateMediaRulesDataAttributes {
 
 // GetAttributesOk returns a tuple with the Attributes field value
 // and a boolean to check if the value has been set.
-func (o *UpdateMediaRulesData) GetAttributesOk() (*CreateMediaRulesDataAttributes, bool) {
+func (o *UpdateMediaRulesData) GetAttributesOk() (*UpdateMediaRulesDataAttributes, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -117,7 +117,7 @@ func (o *UpdateMediaRulesData) GetAttributesOk() (*CreateMediaRulesDataAttribute
 }
 
 // SetAttributes sets field value
-func (o *UpdateMediaRulesData) SetAttributes(v CreateMediaRulesDataAttributes) {
+func (o *UpdateMediaRulesData) SetAttributes(v UpdateMediaRulesDataAttributes) {
 	o.Attributes = v
 }
 

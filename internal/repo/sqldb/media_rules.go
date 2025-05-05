@@ -3,24 +3,23 @@ package sqldb
 import (
 	"context"
 	"database/sql"
-	"database/sql/driver"
-	"encoding/json"
 	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/hs-zavet/media-storage/internal/enums"
 	"github.com/hs-zavet/tokens/roles"
+	"github.com/lib/pq"
 )
 
 const TableMediaRules = "media_rules"
 
 type MediaRulesModel struct {
-	ResourceType string           `db:"resource_type"`
-	ExitSize     []enums.ExitSize `db:"exit_size"`
-	Roles        []roles.Role     `db:"roles_access_update"`
-	UpdatedAt    time.Time        `db:"updated_at"`
-	CreatedAt    time.Time        `db:"created_at"`
+	ID           string       `db:"id"`
+	Extensions   []string     `db:"extensions"`
+	MaxSize      int64        `db:"max_size"`
+	AllowedRoles []roles.Role `db:"allowed_roles"`
+	UpdatedAt    time.Time    `db:"updated_at"`
+	CreatedAt    time.Time    `db:"created_at"`
 }
 
 type MediaRulesQ struct {
@@ -44,57 +43,29 @@ func NewMediaRules(db *sql.DB) MediaRulesQ {
 	}
 }
 
-type ExitSizeJSON []enums.ExitSize
-
-func (e *ExitSizeJSON) Value() (driver.Value, error) {
-	return json.Marshal(e)
-}
-func (e *ExitSizeJSON) Scan(src any) error {
-	if src == nil {
-		*e = nil
-		return nil
-	}
-	b, ok := src.([]byte)
-	if !ok {
-		return fmt.Errorf("exit_size: expect []byte, got %T", src)
-	}
-	return json.Unmarshal(b, (*[]enums.ExitSize)(e))
-}
-
 func (q MediaRulesQ) New() MediaRulesQ {
 	return NewMediaRules(q.db)
 }
 
-type RolesJSON []roles.Role
-
-func (r *RolesJSON) Value() (driver.Value, error) {
-	return json.Marshal(r)
-}
-func (r *RolesJSON) Scan(src any) error {
-	if src == nil {
-		*r = nil
-		return nil
-	}
-	b, ok := src.([]byte)
-	if !ok {
-		return fmt.Errorf("roles_access: expect []byte, got %T", src)
-	}
-	return json.Unmarshal(b, r)
-}
-
 type MediaRulesInsertInput struct {
-	ResourceType string
-	ExitSize     []enums.ExitSize
-	Roles        []roles.Role
+	ID           string
+	Extensions   []string
+	MaxSize      int64
+	AllowedRoles []roles.Role
 	UpdatedAt    time.Time
 	CreatedAt    time.Time
 }
 
 func (q MediaRulesQ) Insert(ctx context.Context, in MediaRulesInsertInput) (MediaRulesModel, error) {
+	rolesInput := make([]string, len(in.AllowedRoles))
+	for i, role := range in.AllowedRoles {
+		rolesInput[i] = string(role)
+	}
 	vals := map[string]any{
-		"resource_type": in.ResourceType,
-		"exit_size":     ExitSizeJSON(in.ExitSize), // ← JSONB
-		"roles_access":  RolesJSON(in.Roles),       // ← JSONB
+		"id":            in.ID,
+		"extensions":    pq.Array(in.Extensions),
+		"allowed_roles": pq.Array(rolesInput),
+		"max_size":      in.MaxSize,
 		"updated_at":    in.UpdatedAt,
 		"created_at":    in.CreatedAt,
 	}
@@ -113,28 +84,37 @@ func (q MediaRulesQ) Insert(ctx context.Context, in MediaRulesInsertInput) (Medi
 	}
 
 	return MediaRulesModel{
-		ResourceType: in.ResourceType,
-		ExitSize:     in.ExitSize,
-		Roles:        in.Roles,
+		ID:           in.ID,
+		Extensions:   in.Extensions,
+		MaxSize:      in.MaxSize,
+		AllowedRoles: in.AllowedRoles,
 		UpdatedAt:    in.UpdatedAt,
 		CreatedAt:    in.CreatedAt,
-	}, nil
+	}, err
 }
 
 type MediaRulesUpdateInput struct {
-	ExitSize  *[]enums.ExitSize
-	Roles     *[]roles.Role
-	UpdatedAt time.Time
+	Extensions   *[]string
+	MaxSize      *int64
+	AllowedRoles *[]roles.Role
+	UpdatedAt    time.Time
 }
 
 func (q MediaRulesQ) Update(ctx context.Context, in MediaRulesUpdateInput) error {
 	vals := map[string]any{"updated_at": in.UpdatedAt}
 
-	if in.ExitSize != nil {
-		vals["exit_size"] = ExitSizeJSON(*in.ExitSize)
+	if in.Extensions != nil {
+		vals["extensions"] = pq.Array(*in.Extensions)
 	}
-	if in.Roles != nil {
-		vals["roles_access"] = RolesJSON(*in.Roles)
+	if in.MaxSize != nil {
+		vals["max_size"] = *in.MaxSize
+	}
+	if in.AllowedRoles != nil {
+		rolesInput := make([]string, len(*in.AllowedRoles))
+		for i, role := range *in.AllowedRoles {
+			rolesInput[i] = string(role)
+		}
+		vals["allowed_roles"] = pq.Array(rolesInput)
 	}
 
 	query, args, err := q.updater.SetMap(vals).ToSql()
@@ -165,46 +145,42 @@ func (q MediaRulesQ) Delete(ctx context.Context) error {
 	return err
 }
 
-type scanner interface{ Scan(dest ...any) error }
-
-func scanRule(s scanner, out *MediaRulesModel) error {
-	var es ExitSizeJSON
-	var rl RolesJSON
-	if err := s.Scan(
-		&out.ResourceType,
-		&es,
-		&rl,
-		&out.UpdatedAt,
-		&out.CreatedAt,
-	); err != nil {
-		return err
-	}
-	out.ExitSize = []enums.ExitSize(es)
-	out.Roles = []roles.Role(rl)
-	return nil
-}
-
 func (q MediaRulesQ) Select(ctx context.Context) ([]MediaRulesModel, error) {
 	query, args, err := q.selector.ToSql()
 	if err != nil {
 		return nil, err
 	}
-
 	rows, err := q.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var list []MediaRulesModel
+	var rules []MediaRulesModel
 	for rows.Next() {
-		var m MediaRulesModel
-		if err := scanRule(rows, &m); err != nil {
+		var r MediaRulesModel
+		var RoleWrapper []string
+		err = rows.Scan(
+			&r.ID,
+			pq.Array(&r.Extensions),
+			pq.Array(&RoleWrapper),
+			&r.MaxSize,
+			&r.UpdatedAt,
+			&r.CreatedAt,
+		)
+		if err != nil {
 			return nil, err
 		}
-		list = append(list, m)
+		r.AllowedRoles = make([]roles.Role, len(RoleWrapper))
+		for i, role := range RoleWrapper {
+			r.AllowedRoles[i], err = roles.ParseRole(role)
+			if err != nil {
+				return nil, fmt.Errorf("parsing role: %w", err)
+			}
+		}
+		rules = append(rules, r)
 	}
-	return list, nil
+	return rules, nil
 }
 
 func (q MediaRulesQ) Get(ctx context.Context) (MediaRulesModel, error) {
@@ -213,18 +189,35 @@ func (q MediaRulesQ) Get(ctx context.Context) (MediaRulesModel, error) {
 		return MediaRulesModel{}, err
 	}
 
-	var m MediaRulesModel
-	if err := scanRule(q.db.QueryRowContext(ctx, query, args...), &m); err != nil {
+	var r MediaRulesModel
+	var RoleWrapper []string
+	err = q.db.QueryRowContext(ctx, query, args...).Scan(
+		&r.ID,
+		pq.Array(&r.Extensions),
+		pq.Array(&RoleWrapper),
+		&r.MaxSize,
+		&r.UpdatedAt,
+		&r.CreatedAt,
+	)
+	if err != nil {
 		return MediaRulesModel{}, err
 	}
-	return m, nil
+	r.AllowedRoles = make([]roles.Role, len(RoleWrapper))
+	for i, role := range RoleWrapper {
+		r.AllowedRoles[i], err = roles.ParseRole(role)
+		if err != nil {
+			return MediaRulesModel{}, fmt.Errorf("parsing role: %w", err)
+		}
+	}
+
+	return r, nil
 }
 
-func (q MediaRulesQ) FilterResourceType(resourceType string) MediaRulesQ {
-	q.selector = q.selector.Where(sq.Eq{"resource_type": resourceType})
-	q.counter = q.counter.Where(sq.Eq{"resource_type": resourceType})
-	q.deleter = q.deleter.Where(sq.Eq{"resource_type": resourceType})
-	q.updater = q.updater.Where(sq.Eq{"resource_type": resourceType})
+func (q MediaRulesQ) FilterID(id string) MediaRulesQ {
+	q.selector = q.selector.Where(sq.Eq{"id": id})
+	q.counter = q.counter.Where(sq.Eq{"id": id})
+	q.deleter = q.deleter.Where(sq.Eq{"id": id})
+	q.updater = q.updater.Where(sq.Eq{"id": id})
 	return q
 }
 

@@ -1,18 +1,25 @@
 type: object
 required:
-  - exit_size
+  - extensions
+  - max_size
   - roles
   - updated_at
   - created_at
 properties:
-  exit_size:
-    $ref: './ExitSize.yaml'
+  extensions:
+    type: array
+    items:
+      type: string
+      description: "Indicates if the media is exit size"
+  max_size:
+    type: integer
+    format: int64
+    description: "Maximum size of the media in bytes"
   roles:
     type: array
     items:
       type: string
-      enum: [ admin, user ]
-      description: "Roles that can access the media"
+      description: "Roles associated with the media rules"
   updated_at:
     type: string
     format: date-time

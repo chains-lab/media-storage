@@ -22,7 +22,9 @@ var _ MappedNullable = &MediaRulesAttributes{}
 
 // MediaRulesAttributes struct for MediaRulesAttributes
 type MediaRulesAttributes struct {
-	ExitSize []ExitSizeInner `json:"exit_size"`
+	Extensions []string `json:"extensions"`
+	// Maximum size of the media in bytes
+	MaxSize int64 `json:"max_size"`
 	Roles []string `json:"roles"`
 	// Date and time when the media rules were last updated
 	UpdatedAt time.Time `json:"updated_at"`
@@ -36,9 +38,10 @@ type _MediaRulesAttributes MediaRulesAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewMediaRulesAttributes(exitSize []ExitSizeInner, roles []string, updatedAt time.Time, createdAt time.Time) *MediaRulesAttributes {
+func NewMediaRulesAttributes(extensions []string, maxSize int64, roles []string, updatedAt time.Time, createdAt time.Time) *MediaRulesAttributes {
 	this := MediaRulesAttributes{}
-	this.ExitSize = exitSize
+	this.Extensions = extensions
+	this.MaxSize = maxSize
 	this.Roles = roles
 	this.UpdatedAt = updatedAt
 	this.CreatedAt = createdAt
@@ -53,28 +56,52 @@ func NewMediaRulesAttributesWithDefaults() *MediaRulesAttributes {
 	return &this
 }
 
-// GetExitSize returns the ExitSize field value
-func (o *MediaRulesAttributes) GetExitSize() []ExitSizeInner {
+// GetExtensions returns the Extensions field value
+func (o *MediaRulesAttributes) GetExtensions() []string {
 	if o == nil {
-		var ret []ExitSizeInner
+		var ret []string
 		return ret
 	}
 
-	return o.ExitSize
+	return o.Extensions
 }
 
-// GetExitSizeOk returns a tuple with the ExitSize field value
+// GetExtensionsOk returns a tuple with the Extensions field value
 // and a boolean to check if the value has been set.
-func (o *MediaRulesAttributes) GetExitSizeOk() ([]ExitSizeInner, bool) {
+func (o *MediaRulesAttributes) GetExtensionsOk() ([]string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return o.ExitSize, true
+	return o.Extensions, true
 }
 
-// SetExitSize sets field value
-func (o *MediaRulesAttributes) SetExitSize(v []ExitSizeInner) {
-	o.ExitSize = v
+// SetExtensions sets field value
+func (o *MediaRulesAttributes) SetExtensions(v []string) {
+	o.Extensions = v
+}
+
+// GetMaxSize returns the MaxSize field value
+func (o *MediaRulesAttributes) GetMaxSize() int64 {
+	if o == nil {
+		var ret int64
+		return ret
+	}
+
+	return o.MaxSize
+}
+
+// GetMaxSizeOk returns a tuple with the MaxSize field value
+// and a boolean to check if the value has been set.
+func (o *MediaRulesAttributes) GetMaxSizeOk() (*int64, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.MaxSize, true
+}
+
+// SetMaxSize sets field value
+func (o *MediaRulesAttributes) SetMaxSize(v int64) {
+	o.MaxSize = v
 }
 
 // GetRoles returns the Roles field value
@@ -159,7 +186,8 @@ func (o MediaRulesAttributes) MarshalJSON() ([]byte, error) {
 
 func (o MediaRulesAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["exit_size"] = o.ExitSize
+	toSerialize["extensions"] = o.Extensions
+	toSerialize["max_size"] = o.MaxSize
 	toSerialize["roles"] = o.Roles
 	toSerialize["updated_at"] = o.UpdatedAt
 	toSerialize["created_at"] = o.CreatedAt
@@ -171,7 +199,8 @@ func (o *MediaRulesAttributes) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"exit_size",
+		"extensions",
+		"max_size",
 		"roles",
 		"updated_at",
 		"created_at",

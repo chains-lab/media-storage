@@ -4,7 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ExitSize** | [**[]ExitSizeInner**](ExitSizeInner.md) |  | 
+**Extensions** | **[]string** |  | 
+**MaxSize** | **int64** | Maximum size of the media in bytes | 
 **Roles** | **[]string** |  | 
 **UpdatedAt** | **time.Time** | Date and time when the media rules were last updated | 
 **CreatedAt** | **time.Time** | Date and time when the media rules were created | 
@@ -13,7 +14,7 @@ Name | Type | Description | Notes
 
 ### NewMediaRulesAttributes
 
-`func NewMediaRulesAttributes(exitSize []ExitSizeInner, roles []string, updatedAt time.Time, createdAt time.Time, ) *MediaRulesAttributes`
+`func NewMediaRulesAttributes(extensions []string, maxSize int64, roles []string, updatedAt time.Time, createdAt time.Time, ) *MediaRulesAttributes`
 
 NewMediaRulesAttributes instantiates a new MediaRulesAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -28,24 +29,44 @@ NewMediaRulesAttributesWithDefaults instantiates a new MediaRulesAttributes obje
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetExitSize
+### GetExtensions
 
-`func (o *MediaRulesAttributes) GetExitSize() []ExitSizeInner`
+`func (o *MediaRulesAttributes) GetExtensions() []string`
 
-GetExitSize returns the ExitSize field if non-nil, zero value otherwise.
+GetExtensions returns the Extensions field if non-nil, zero value otherwise.
 
-### GetExitSizeOk
+### GetExtensionsOk
 
-`func (o *MediaRulesAttributes) GetExitSizeOk() (*[]ExitSizeInner, bool)`
+`func (o *MediaRulesAttributes) GetExtensionsOk() (*[]string, bool)`
 
-GetExitSizeOk returns a tuple with the ExitSize field if it's non-nil, zero value otherwise
+GetExtensionsOk returns a tuple with the Extensions field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetExitSize
+### SetExtensions
 
-`func (o *MediaRulesAttributes) SetExitSize(v []ExitSizeInner)`
+`func (o *MediaRulesAttributes) SetExtensions(v []string)`
 
-SetExitSize sets ExitSize field to given value.
+SetExtensions sets Extensions field to given value.
+
+
+### GetMaxSize
+
+`func (o *MediaRulesAttributes) GetMaxSize() int64`
+
+GetMaxSize returns the MaxSize field if non-nil, zero value otherwise.
+
+### GetMaxSizeOk
+
+`func (o *MediaRulesAttributes) GetMaxSizeOk() (*int64, bool)`
+
+GetMaxSizeOk returns a tuple with the MaxSize field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMaxSize
+
+`func (o *MediaRulesAttributes) SetMaxSize(v int64)`
+
+SetMaxSize sets MaxSize field to given value.
 
 
 ### GetRoles

@@ -11,4 +11,5 @@ var (
 	ErrUserNotAllowedToDownloadMedia = fmt.Errorf("user not allowed to download media")
 	ErrUserNotAllowedToDeleteMedia   = fmt.Errorf("user not allowed to delete media")
 	ErrMediaNotFound                 = fmt.Errorf("media not found")
+	ErrMediaExtensionNotAllowed      = fmt.Errorf("media extension not allowed")
 )

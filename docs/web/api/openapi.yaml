@@ -42,6 +42,9 @@ components:
         format:
           description: file format
           type: string
+        extension:
+          description: file extension
+          type: string
         size:
           description: file size in bytes
           format: int64
@@ -50,13 +53,30 @@ components:
           description: media URL
           format: uri
           type: string
+        resource:
+          description: media resource
+          type: string
+        resource_id:
+          description: media resource ID
+          type: string
+        category:
+          description: media category
+          type: string
+        owner_id:
+          description: media owner ID
+          type: string
         created_at:
           description: media creation date and time
           format: date-time
           type: string
       required:
+      - category
       - created_at
+      - extension
       - format
+      - owner_id
+      - resource
+      - resource_id
       - size
       - url
     MediaCollection:
@@ -81,7 +101,7 @@ components:
     MediaRulesData:
       properties:
         id:
-          description: media resource type
+          description: media rules id
           type: string
         type:
           enum:
@@ -95,16 +115,18 @@ components:
       - type
     MediaRulesAttributes:
       properties:
-        exit_size:
+        extensions:
           items:
-            $ref: '#/components/schemas/ExitSize_inner'
+            description: Indicates if the media is exit size
+            type: string
           type: array
+        max_size:
+          description: Maximum size of the media in bytes
+          format: int64
+          type: integer
         roles:
           items:
-            description: Roles that can access the media
-            enum:
-            - admin
-            - user
+            description: Roles associated with the media rules
             type: string
           type: array
         updated_at:
@@ -117,7 +139,8 @@ components:
           type: string
       required:
       - created_at
-      - exit_size
+      - extensions
+      - max_size
       - roles
       - updated_at
     CreateMediaRules:
@@ -139,10 +162,6 @@ components:
       required:
       - data
       - links
-    ExitSize:
-      items:
-        $ref: '#/components/schemas/ExitSize_inner'
-      type: array
     MediaCollection_data_attributes:
       properties:
         data:
@@ -164,14 +183,22 @@ components:
       - type
     UploadMedia_data_attributes:
       properties:
-        resource_id:
-          description: resource id
+        resource:
+          description: media resource
           type: string
-        media_type:
-          description: content type
+        resource_id:
+          description: media resource ID
+          type: string
+        category:
+          description: media category
+          type: string
+        owner_id:
+          description: media owner ID
           type: string
       required:
-      - media_type
+      - category
+      - owner_id
+      - resource
       - resource_id
     UploadMedia_data:
       properties:
@@ -186,25 +213,28 @@ components:
       - type
     CreateMediaRules_data_attributes:
       properties:
-        exit_size:
+        extensions:
           items:
-            $ref: '#/components/schemas/ExitSize_inner'
+            description: Indicates if the media is exit size
+            type: string
           type: array
+        max_size:
+          description: Maximum size of the media in bytes
+          format: int64
+          type: integer
         roles:
           items:
-            description: Roles that can access the media
-            enum:
-            - admin
-            - user
+            description: Roles associated with the media rules
             type: string
           type: array
       required:
-      - exit_size
+      - extensions
+      - max_size
       - roles
     CreateMediaRules_data:
       properties:
         id:
-          description: media resource type
+          description: Unique identifier for the media rules
           type: string
         type:
           enum:
@@ -216,17 +246,33 @@ components:
       - attributes
       - id
       - type
+    UpdateMediaRules_data_attributes:
+      properties:
+        extensions:
+          items:
+            description: Indicates if the media is exit size
+            type: string
+          type: array
+        max_size:
+          description: Maximum size of the media in bytes
+          format: int64
+          type: integer
+        roles:
+          items:
+            description: Roles associated with the media rules
+            type: string
+          type: array
     UpdateMediaRules_data:
       properties:
         id:
-          description: media resource type
+          description: media rules id
           type: string
         type:
           enum:
           - update_media_rules
           type: string
         attributes:
-          $ref: '#/components/schemas/CreateMediaRules_data_attributes'
+          $ref: '#/components/schemas/UpdateMediaRules_data_attributes'
       required:
       - attributes
       - id
@@ -250,15 +296,3 @@ components:
       required:
       - attributes
       - type
-    ExitSize_inner:
-      properties:
-        exit:
-          description: exit name
-          type: string
-        size:
-          description: exit size
-          format: int64
-          type: integer
-      required:
-      - exit
-      - size

@@ -12,9 +12,9 @@ import (
 )
 
 func (h *Handler) GetMediaRules(w http.ResponseWriter, r *http.Request) {
-	resourceType := chi.URLParam(r, "resource_type")
+	ruleID := chi.URLParam(r, "resource-category")
 
-	res, err := h.app.GetMediaRules(r.Context(), resourceType)
+	res, err := h.app.GetMediaRules(r.Context(), ruleID)
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaRulesNotFound):

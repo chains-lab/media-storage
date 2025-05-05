@@ -22,9 +22,7 @@ func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourceType := chi.URLParam(r, "resource_type")
-
-	resourceID, err := uuid.Parse(chi.URLParam(r, "media_id"))
+	mediaID, err := uuid.Parse(chi.URLParam(r, "media_id"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
@@ -34,10 +32,10 @@ func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.app.DeleteMedia(r.Context(), app.DeleteMediaRequest{
-		User:         user,
-		ResourceType: resourceType,
-		ResourceID:   resourceID,
-		InitiatorID:  user.AccountID,
+		UserID:      user.AccountID,
+		UserRole:    user.Role,
+		MediaID:     mediaID,
+		InitiatorID: user.AccountID,
 	})
 	if err != nil {
 		switch {

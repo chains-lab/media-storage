@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | media resource type | 
+**Id** | **string** | media rules id | 
 **Type** | **string** |  | 
-**Attributes** | [**CreateMediaRulesDataAttributes**](CreateMediaRulesDataAttributes.md) |  | 
+**Attributes** | [**UpdateMediaRulesDataAttributes**](UpdateMediaRulesDataAttributes.md) |  | 
 
 ## Methods
 
 ### NewUpdateMediaRulesData
 
-`func NewUpdateMediaRulesData(id string, type_ string, attributes CreateMediaRulesDataAttributes, ) *UpdateMediaRulesData`
+`func NewUpdateMediaRulesData(id string, type_ string, attributes UpdateMediaRulesDataAttributes, ) *UpdateMediaRulesData`
 
 NewUpdateMediaRulesData instantiates a new UpdateMediaRulesData object
 This constructor will assign default values to properties that have it defined,
@@ -69,20 +69,20 @@ SetType sets Type field to given value.
 
 ### GetAttributes
 
-`func (o *UpdateMediaRulesData) GetAttributes() CreateMediaRulesDataAttributes`
+`func (o *UpdateMediaRulesData) GetAttributes() UpdateMediaRulesDataAttributes`
 
 GetAttributes returns the Attributes field if non-nil, zero value otherwise.
 
 ### GetAttributesOk
 
-`func (o *UpdateMediaRulesData) GetAttributesOk() (*CreateMediaRulesDataAttributes, bool)`
+`func (o *UpdateMediaRulesData) GetAttributesOk() (*UpdateMediaRulesDataAttributes, bool)`
 
 GetAttributesOk returns a tuple with the Attributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttributes
 
-`func (o *UpdateMediaRulesData) SetAttributes(v CreateMediaRulesDataAttributes)`
+`func (o *UpdateMediaRulesData) SetAttributes(v UpdateMediaRulesDataAttributes)`
 
 SetAttributes sets Attributes field to given value.
 

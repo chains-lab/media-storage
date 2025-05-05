@@ -9,12 +9,11 @@ import (
 )
 
 func (h *Handler) DeleteMediaRules(w http.ResponseWriter, r *http.Request) {
-	mediaResourceType := chi.URLParam(r, "resource_type")
+	ruleID := chi.URLParam(r, "resource-category")
 
-	err := h.app.DeleteMediaRules(r.Context(), mediaResourceType)
+	err := h.app.DeleteMediaRules(r.Context(), ruleID)
 	if err != nil {
 		switch {
-		//TODO: add more specific errors add validation for delete resources
 		default:
 			httpkit.RenderErr(w, problems.InternalError())
 		}

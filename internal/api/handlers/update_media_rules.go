@@ -15,7 +15,7 @@ import (
 )
 
 func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
-	resourceType := chi.URLParam(r, "resource_type")
+	ruleID := chi.URLParam(r, "resource-category")
 
 	req, err := requests.UpdateMediaRules(r)
 	if err != nil {
@@ -24,10 +24,10 @@ func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if resourceType != req.Data.Id {
-		h.log.WithError(err).Warn("Error parsing request")
+	if ruleID != req.Data.Id {
+		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"resource_type": validation.NewError("resource_type", "invalid media resource id"),
+			"resource-category": validation.NewError("resource-category", "invalid resource category"),
 		})...)
 		return
 	}
@@ -42,14 +42,16 @@ func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
 			})...)
 			return
 		}
-		updateReq.Roles = &curRoles
+		updateReq.AllowedRoles = &curRoles
 	}
-	if req.Data.Attributes.ExitSize != nil {
-		extSize := parseExtSize(req.Data.Attributes.ExitSize)
-		updateReq.ExtSize = &extSize
+	if req.Data.Attributes.Extensions != nil {
+		updateReq.Extensions = &req.Data.Attributes.Extensions
+	}
+	if req.Data.Attributes.MaxSize != nil {
+		updateReq.MaxSize = req.Data.Attributes.MaxSize
 	}
 
-	res, err := h.app.UpdateMediaRules(r.Context(), resourceType, updateReq)
+	res, err := h.app.UpdateMediaRules(r.Context(), ruleID, updateReq)
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaRulesNotFound):
@@ -57,7 +59,7 @@ func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
 		default:
 			httpkit.RenderErr(w, problems.InternalError())
 		}
-		h.log.WithError(err).Errorf("error updating media rule %s", resourceType)
+		h.log.WithError(err).Errorf("error updating media rule %s", ruleID)
 		return
 	}
 

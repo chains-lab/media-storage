@@ -18,21 +18,22 @@ const (
 )
 
 type MediaModel struct {
-	ID           uuid.UUID `db:"id"`
-	Ext          string    `db:"extension"`
-	Size         int64     `db:"size"`
-	URL          string    `db:"url"`
-	ResourceType string    `db:"resource_type"`
-	ResourceID   uuid.UUID `db:"resource_id"`
-	OwnerID      uuid.UUID `db:"owner_id"`
-	CreatedAt    time.Time `db:"created_at"`
+	ID         uuid.UUID
+	Format     string
+	Extension  string
+	Size       int64
+	Url        string
+	Resource   string
+	ResourceID string
+	Category   string
+	OwnerID    uuid.UUID
+	CreatedAt  time.Time
 }
 
 type mediaAws interface {
-	AddFile(ctx context.Context, data aws.FileData, reader io.Reader) (aws.MediaModel, error)
-	GetFile(ctx context.Context, data aws.FileData) (aws.MediaModel, error)
-	DeleteFile(ctx context.Context, data aws.FileData) error
-	ListFiles(ctx context.Context, folder string, offset, limit uint) ([]aws.MediaModel, error)
+	UploadFile(ctx context.Context, reader io.Reader, folder, filename string) (aws.MediaModel, error)
+	GetFileByUrl(ctx context.Context, rawURL string) (aws.MediaModel, error)
+	DeleteFileByUrl(ctx context.Context, rawURL string) error
 	DeleteFilesByPrefix(ctx context.Context, prefix string) error
 }
 
@@ -44,8 +45,13 @@ type mediaSQL interface {
 	Select(ctx context.Context) ([]sqldb.MediaModel, error)
 	Get(ctx context.Context) (sqldb.MediaModel, error)
 
-	FilterFilename(id uuid.UUID) sqldb.MediaQ
-	FilterResourceType(resourceType string) sqldb.MediaQ
+	FilterID(id uuid.UUID) sqldb.MediaQ
+	FilterResource(resourceType string) sqldb.MediaQ
+	FilterResourceID(resourceID string) sqldb.MediaQ
+	FilterCategory(category string) sqldb.MediaQ
+	FilterOwnerID(ownerID uuid.UUID) sqldb.MediaQ
+	FilterByID(id uuid.UUID) sqldb.MediaQ
+	FilterByUrl(url string) sqldb.MediaQ
 
 	Count(ctx context.Context) (int, error)
 	Transaction(fn func(ctx context.Context) error) error
@@ -75,75 +81,72 @@ func NewMedia(cfg config.Config) (MediaRepo, error) {
 }
 
 type AddMediaInput struct {
-	Filename     uuid.UUID
-	Ext          string
-	ResourceType string
-	ResourceID   uuid.UUID
-	OwnerID      uuid.UUID
-	CreatedAt    time.Time
+	Filename   string // Filename is original filename without changes and without path
+	Resource   string
+	ResourceID string
+	Category   string
+	OwnerID    uuid.UUID
+	CreatedAt  time.Time
 }
 
-func (r MediaRepo) AddMedia(ctx context.Context, reader io.Reader, input AddMediaInput) (MediaModel, error) {
-	sqlInput := sqldb.MediaInsertInput{
-		Filename:     input.Filename,
-		Ext:          input.Ext,
-		ResourceType: input.ResourceType,
-		ResourceID:   input.ResourceID,
-		CreatedAt:    input.CreatedAt,
-		OwnerID:      input.OwnerID,
-	}
-
-	resSql, err := r.sql.New().Insert(ctx, sqlInput)
-	if err != nil {
-		return MediaModel{}, fmt.Errorf("sql insert failed: %w", err)
-	}
-
-	resAsw, err := r.s3.AddFile(ctx, aws.FileData{
-		ResourceType: input.ResourceType,
-		Filename:     input.Filename,
-		Ext:          input.Ext,
-	}, reader)
+func (r MediaRepo) UploadMedia(ctx context.Context, reader io.Reader, input AddMediaInput) (MediaModel, error) {
+	resAsw, err := r.s3.UploadFile(ctx, reader, fmt.Sprintf("%s-%s", input.Resource, input.Category), input.Filename)
 	if err != nil {
 		return MediaModel{}, fmt.Errorf("s3 upload failed: %w", err)
+	}
+
+	id, err := uuid.Parse(resAsw.ID)
+	if err != nil {
+		return MediaModel{}, fmt.Errorf("uuid parse failed: %w", err)
+	}
+
+	sqlInput := sqldb.MediaInsertInput{
+		ID:         id,
+		Format:     resAsw.ContentType,
+		Extension:  resAsw.Extension,
+		Size:       resAsw.Size,
+		Url:        resAsw.Url,
+		Resource:   input.Resource,
+		ResourceID: input.ResourceID,
+		Category:   input.Category,
+		OwnerID:    input.OwnerID,
+		CreatedAt:  input.CreatedAt,
+	}
+
+	resSql, err := r.sql.Insert(ctx, sqlInput)
+	if err != nil {
+		return MediaModel{}, fmt.Errorf("sql insert failed: %w", err)
 	}
 
 	return createMediaModel(resSql, resAsw), nil
 }
 
-func (r MediaRepo) GetMedia(ctx context.Context, filename uuid.UUID) (MediaModel, error) {
-	sqlMedia, err := r.sql.New().FilterFilename(filename).Get(ctx)
+func (r MediaRepo) GetMedia(ctx context.Context, mediaID uuid.UUID) (MediaModel, error) {
+	sqlMedia, err := r.sql.New().FilterID(mediaID).Get(ctx)
 	if err != nil {
 		return MediaModel{}, fmt.Errorf("sql get: %w", err)
 	}
 
-	s3Media, err := r.s3.ListFiles(ctx, sqlMedia.ResourceType, 0, 1)
+	s3Media, err := r.s3.GetFileByUrl(ctx, sqlMedia.Url)
 	if err != nil {
 		return MediaModel{}, fmt.Errorf("s3 list: %w", err)
 	}
 
-	if len(s3Media) == 0 {
-		return MediaModel{}, fmt.Errorf("media not found")
-	}
-
-	return createMediaModel(sqlMedia, s3Media[0]), nil
+	return createMediaModel(sqlMedia, s3Media), nil
 }
 
-func (r MediaRepo) DeleteMedia(ctx context.Context, fileId uuid.UUID) error {
-	media, err := r.GetMedia(ctx, fileId)
+func (r MediaRepo) DeleteMedia(ctx context.Context, mediaID uuid.UUID) error {
+	media, err := r.GetMedia(ctx, mediaID)
 	if err != nil {
 		return fmt.Errorf("get media: %w", err)
 	}
 
-	err = r.s3.DeleteFile(ctx, aws.FileData{
-		ResourceType: media.ResourceType,
-		Filename:     fileId,
-		Ext:          media.Ext,
-	})
+	err = r.s3.DeleteFileByUrl(ctx, media.Url)
 	if err != nil {
 		return fmt.Errorf("s3 delete: %w", err)
 	}
 
-	err = r.sql.New().FilterFilename(fileId).Delete(ctx)
+	err = r.sql.New().FilterID(mediaID).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("sql delete: %w", err)
 	}
@@ -151,31 +154,33 @@ func (r MediaRepo) DeleteMedia(ctx context.Context, fileId uuid.UUID) error {
 	return nil
 }
 
-func createMediaModel(sql sqldb.MediaModel, aws aws.MediaModel) MediaModel {
-	res := MediaModel{
-		ID:           sql.Filename,
-		Ext:          sql.Ext,
-		Size:         aws.Size,
-		URL:          aws.URL,
-		OwnerID:      sql.OwnerID,
-		ResourceType: sql.ResourceType,
-		ResourceID:   sql.ResourceID,
-		CreatedAt:    sql.CreatedAt,
-	}
-
-	return res
-}
-
-func (r MediaRepo) DeleteFilesByResourceType(ctx context.Context, resourceType string) error {
-	err := r.s3.DeleteFilesByPrefix(ctx, resourceType)
+func (r MediaRepo) DeleteFilesByResourceAndCategory(ctx context.Context, resource, category string) error {
+	err := r.s3.DeleteFilesByPrefix(ctx, fmt.Sprintf("%s-%s", resource, category))
 	if err != nil {
 		return fmt.Errorf("s3 delete by prefix: %w", err)
 	}
 
-	err = r.sql.New().FilterResourceType(resourceType).Delete(ctx)
+	err = r.sql.New().FilterResource(resource).FilterCategory(category).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("sql delete by prefix: %w", err)
 	}
 
 	return nil
+}
+
+func createMediaModel(sql sqldb.MediaModel, aws aws.MediaModel) MediaModel {
+	res := MediaModel{
+		ID:         sql.ID,
+		Format:     aws.ContentType,
+		Extension:  aws.Extension,
+		Size:       aws.Size,
+		Url:        aws.Url,
+		Resource:   sql.Resource,
+		ResourceID: sql.ResourceID,
+		Category:   sql.Category,
+		OwnerID:    sql.OwnerID,
+		CreatedAt:  sql.CreatedAt,
+	}
+
+	return res
 }

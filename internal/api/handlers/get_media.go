@@ -14,7 +14,7 @@ import (
 )
 
 func (h *Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
-	resourceID, err := uuid.Parse(chi.URLParam(r, "media_id"))
+	mediaId, err := uuid.Parse(chi.URLParam(r, "media_id"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
@@ -23,7 +23,7 @@ func (h *Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	media, err := h.app.GetMedia(r.Context(), resourceID)
+	media, err := h.app.GetMedia(r.Context(), mediaId)
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaNotFound):

@@ -4,7 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Attributes** | Pointer to [**CreateMediaRulesDataAttributes**](CreateMediaRulesDataAttributes.md) |  | [optional] 
+**Extensions** | Pointer to **[]string** |  | [optional] 
+**MaxSize** | Pointer to **int64** | Maximum size of the media in bytes | [optional] 
+**Roles** | Pointer to **[]string** |  | [optional] 
 
 ## Methods
 
@@ -25,30 +27,80 @@ NewUpdateMediaRulesDataAttributesWithDefaults instantiates a new UpdateMediaRule
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetAttributes
+### GetExtensions
 
-`func (o *UpdateMediaRulesDataAttributes) GetAttributes() CreateMediaRulesDataAttributes`
+`func (o *UpdateMediaRulesDataAttributes) GetExtensions() []string`
 
-GetAttributes returns the Attributes field if non-nil, zero value otherwise.
+GetExtensions returns the Extensions field if non-nil, zero value otherwise.
 
-### GetAttributesOk
+### GetExtensionsOk
 
-`func (o *UpdateMediaRulesDataAttributes) GetAttributesOk() (*CreateMediaRulesDataAttributes, bool)`
+`func (o *UpdateMediaRulesDataAttributes) GetExtensionsOk() (*[]string, bool)`
 
-GetAttributesOk returns a tuple with the Attributes field if it's non-nil, zero value otherwise
+GetExtensionsOk returns a tuple with the Extensions field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetAttributes
+### SetExtensions
 
-`func (o *UpdateMediaRulesDataAttributes) SetAttributes(v CreateMediaRulesDataAttributes)`
+`func (o *UpdateMediaRulesDataAttributes) SetExtensions(v []string)`
 
-SetAttributes sets Attributes field to given value.
+SetExtensions sets Extensions field to given value.
 
-### HasAttributes
+### HasExtensions
 
-`func (o *UpdateMediaRulesDataAttributes) HasAttributes() bool`
+`func (o *UpdateMediaRulesDataAttributes) HasExtensions() bool`
 
-HasAttributes returns a boolean if a field has been set.
+HasExtensions returns a boolean if a field has been set.
+
+### GetMaxSize
+
+`func (o *UpdateMediaRulesDataAttributes) GetMaxSize() int64`
+
+GetMaxSize returns the MaxSize field if non-nil, zero value otherwise.
+
+### GetMaxSizeOk
+
+`func (o *UpdateMediaRulesDataAttributes) GetMaxSizeOk() (*int64, bool)`
+
+GetMaxSizeOk returns a tuple with the MaxSize field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetMaxSize
+
+`func (o *UpdateMediaRulesDataAttributes) SetMaxSize(v int64)`
+
+SetMaxSize sets MaxSize field to given value.
+
+### HasMaxSize
+
+`func (o *UpdateMediaRulesDataAttributes) HasMaxSize() bool`
+
+HasMaxSize returns a boolean if a field has been set.
+
+### GetRoles
+
+`func (o *UpdateMediaRulesDataAttributes) GetRoles() []string`
+
+GetRoles returns the Roles field if non-nil, zero value otherwise.
+
+### GetRolesOk
+
+`func (o *UpdateMediaRulesDataAttributes) GetRolesOk() (*[]string, bool)`
+
+GetRolesOk returns a tuple with the Roles field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRoles
+
+`func (o *UpdateMediaRulesDataAttributes) SetRoles(v []string)`
+
+SetRoles sets Roles field to given value.
+
+### HasRoles
+
+`func (o *UpdateMediaRulesDataAttributes) HasRoles() bool`
+
+HasRoles returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

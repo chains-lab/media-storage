@@ -1,13 +1,21 @@
 type: object
 required:
   - format
+  - extension
   - size
   - url
+  - resource
+  - resource_id
+  - category
+  - owner_id
   - created_at
 properties:
   format:
     type: string
     description: "file format"
+  extension:
+    type: string
+    description: "file extension"
   size:
     type: integer
     format: int64
@@ -16,6 +24,18 @@ properties:
     type: string
     format: uri
     description: "media URL"
+  resource:
+    type: string
+    description: "media resource"
+  resource_id:
+    type: string
+    description: "media resource ID"
+  category:
+    type: string
+    description: "media category"
+  owner_id:
+    type: string
+    description: "media owner ID"
   created_at:
     type: string
     format: date-time

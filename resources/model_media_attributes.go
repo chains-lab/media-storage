@@ -24,10 +24,20 @@ var _ MappedNullable = &MediaAttributes{}
 type MediaAttributes struct {
 	// file format
 	Format string `json:"format"`
+	// file extension
+	Extension string `json:"extension"`
 	// file size in bytes
 	Size int64 `json:"size"`
 	// media URL
 	Url string `json:"url"`
+	// media resource
+	Resource string `json:"resource"`
+	// media resource ID
+	ResourceId string `json:"resource_id"`
+	// media category
+	Category string `json:"category"`
+	// media owner ID
+	OwnerId string `json:"owner_id"`
 	// media creation date and time
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -38,11 +48,16 @@ type _MediaAttributes MediaAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewMediaAttributes(format string, size int64, url string, createdAt time.Time) *MediaAttributes {
+func NewMediaAttributes(format string, extension string, size int64, url string, resource string, resourceId string, category string, ownerId string, createdAt time.Time) *MediaAttributes {
 	this := MediaAttributes{}
 	this.Format = format
+	this.Extension = extension
 	this.Size = size
 	this.Url = url
+	this.Resource = resource
+	this.ResourceId = resourceId
+	this.Category = category
+	this.OwnerId = ownerId
 	this.CreatedAt = createdAt
 	return &this
 }
@@ -77,6 +92,30 @@ func (o *MediaAttributes) GetFormatOk() (*string, bool) {
 // SetFormat sets field value
 func (o *MediaAttributes) SetFormat(v string) {
 	o.Format = v
+}
+
+// GetExtension returns the Extension field value
+func (o *MediaAttributes) GetExtension() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Extension
+}
+
+// GetExtensionOk returns a tuple with the Extension field value
+// and a boolean to check if the value has been set.
+func (o *MediaAttributes) GetExtensionOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Extension, true
+}
+
+// SetExtension sets field value
+func (o *MediaAttributes) SetExtension(v string) {
+	o.Extension = v
 }
 
 // GetSize returns the Size field value
@@ -127,6 +166,102 @@ func (o *MediaAttributes) SetUrl(v string) {
 	o.Url = v
 }
 
+// GetResource returns the Resource field value
+func (o *MediaAttributes) GetResource() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Resource
+}
+
+// GetResourceOk returns a tuple with the Resource field value
+// and a boolean to check if the value has been set.
+func (o *MediaAttributes) GetResourceOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Resource, true
+}
+
+// SetResource sets field value
+func (o *MediaAttributes) SetResource(v string) {
+	o.Resource = v
+}
+
+// GetResourceId returns the ResourceId field value
+func (o *MediaAttributes) GetResourceId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.ResourceId
+}
+
+// GetResourceIdOk returns a tuple with the ResourceId field value
+// and a boolean to check if the value has been set.
+func (o *MediaAttributes) GetResourceIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.ResourceId, true
+}
+
+// SetResourceId sets field value
+func (o *MediaAttributes) SetResourceId(v string) {
+	o.ResourceId = v
+}
+
+// GetCategory returns the Category field value
+func (o *MediaAttributes) GetCategory() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Category
+}
+
+// GetCategoryOk returns a tuple with the Category field value
+// and a boolean to check if the value has been set.
+func (o *MediaAttributes) GetCategoryOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Category, true
+}
+
+// SetCategory sets field value
+func (o *MediaAttributes) SetCategory(v string) {
+	o.Category = v
+}
+
+// GetOwnerId returns the OwnerId field value
+func (o *MediaAttributes) GetOwnerId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.OwnerId
+}
+
+// GetOwnerIdOk returns a tuple with the OwnerId field value
+// and a boolean to check if the value has been set.
+func (o *MediaAttributes) GetOwnerIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.OwnerId, true
+}
+
+// SetOwnerId sets field value
+func (o *MediaAttributes) SetOwnerId(v string) {
+	o.OwnerId = v
+}
+
 // GetCreatedAt returns the CreatedAt field value
 func (o *MediaAttributes) GetCreatedAt() time.Time {
 	if o == nil {
@@ -162,8 +297,13 @@ func (o MediaAttributes) MarshalJSON() ([]byte, error) {
 func (o MediaAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["format"] = o.Format
+	toSerialize["extension"] = o.Extension
 	toSerialize["size"] = o.Size
 	toSerialize["url"] = o.Url
+	toSerialize["resource"] = o.Resource
+	toSerialize["resource_id"] = o.ResourceId
+	toSerialize["category"] = o.Category
+	toSerialize["owner_id"] = o.OwnerId
 	toSerialize["created_at"] = o.CreatedAt
 	return toSerialize, nil
 }
@@ -174,8 +314,13 @@ func (o *MediaAttributes) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"format",
+		"extension",
 		"size",
 		"url",
+		"resource",
+		"resource_id",
+		"category",
+		"owner_id",
 		"created_at",
 	}
 

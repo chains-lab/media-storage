@@ -14,12 +14,20 @@ properties:
       attributes:
         type: object
         required:
+          - resource
           - resource_id
-          - media_type
+          - category
+          - owner_id
         properties:
+          resource:
+            type: string
+            description: "media resource"
           resource_id:
             type: string
-            description: "resource id"
-          media_type:
+            description: "media resource ID"
+          category:
             type: string
-            description: "content type"
+            description: "media category"
+          owner_id:
+            type: string
+            description: "media owner ID"

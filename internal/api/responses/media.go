@@ -1,16 +1,21 @@
 package responses
 
 import (
-	"github.com/hs-zavet/media-storage/internal/app/models"
+	"github.com/hs-zavet/media-storage/internal/app"
 	"github.com/hs-zavet/media-storage/resources"
 )
 
-func Media(media models.Media) resources.Media {
+func Media(media app.MediaModels) resources.Media {
 	attributes := resources.MediaAttributes{
-		Format:    media.Ext,
-		Size:      media.Size,
-		Url:       media.URL,
-		CreatedAt: media.CreatedAt,
+		Format:     media.Format,
+		Extension:  media.Extension,
+		Size:       media.Size,
+		Url:        media.Url,
+		Resource:   media.Resource,
+		ResourceId: media.ResourceID,
+		Category:   media.Category,
+		OwnerId:    media.OwnerID.String(),
+		CreatedAt:  media.CreatedAt,
 	}
 
 	res := resources.Media{

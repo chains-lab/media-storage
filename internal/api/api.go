@@ -50,15 +50,15 @@ func (a *Api) Run(ctx context.Context, log *logrus.Logger) {
 	a.router.Route("/hs-news/media-storage", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/media", func(r chi.Router) {
-				r.Route("/{resource_type}", func(r chi.Router) {
-					r.With(auth).Post("/", a.handlers.UploadMedia)
-					r.With(adminGrant).Delete("/{media_id}", a.handlers.DeleteMedia)
-					r.Get("/{media_id}", a.handlers.GetMedia)
+				r.With(auth).Post("/", a.handlers.UploadMedia)
+				r.Route("/{media_id}", func(r chi.Router) {
+					r.Get("/", a.handlers.GetMedia)
+					r.With(auth).Delete("/", a.handlers.DeleteMedia)
 				})
 			})
 
 			r.Route("/media-rules", func(r chi.Router) {
-				r.Route("/{resource_type}", func(r chi.Router) {
+				r.Route("/{resource-category}", func(r chi.Router) {
 					r.With(adminGrant).Post("/", a.handlers.CreateMediaRules)
 					r.With(adminGrant).Patch("/", a.handlers.UpdateMediaRules)
 					r.With(adminGrant).Delete("/", a.handlers.DeleteMediaRules)

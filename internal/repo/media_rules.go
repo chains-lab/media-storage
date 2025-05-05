@@ -6,17 +6,17 @@ import (
 	"time"
 
 	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/media-storage/internal/enums"
 	"github.com/hs-zavet/media-storage/internal/repo/sqldb"
 	"github.com/hs-zavet/tokens/roles"
 )
 
 type MediaRulesModel struct {
-	ResourceType string           `db:"resource_type"`
-	ExitSize     []enums.ExitSize `db:"exit_size"`
-	Roles        []roles.Role     `db:"roles_access_update"`
-	UpdatedAt    time.Time        `db:"updated_at"`
-	CreatedAt    time.Time        `db:"created_at"`
+	ID           string
+	Extensions   []string
+	MaxSize      int64
+	AllowedRoles []roles.Role
+	UpdatedAt    time.Time
+	CreatedAt    time.Time
 }
 
 type MediaRulesSQL interface {
@@ -28,7 +28,7 @@ type MediaRulesSQL interface {
 	Select(ctx context.Context) ([]sqldb.MediaRulesModel, error)
 	Delete(ctx context.Context) error
 
-	FilterResourceType(resourceType string) sqldb.MediaRulesQ
+	FilterID(id string) sqldb.MediaRulesQ
 
 	Transaction(fn func(ctx context.Context) error) error
 	Count(ctx context.Context) (int, error)
@@ -51,18 +51,20 @@ func NewMediaRulesRepo(cfg config.Config) (MediaRulesRepo, error) {
 }
 
 type CreateMediaRulesInput struct {
-	ResourceType string           `db:"resource_type"`
-	ExitSize     []enums.ExitSize `db:"exit_size"`
-	Roles        []roles.Role     `db:"roles_access_update"`
-	UpdatedAt    time.Time        `db:"updated_at"`
-	CreatedAt    time.Time        `db:"created_at"`
+	ID           string
+	Extensions   []string
+	MaxSize      int64
+	AllowedRoles []roles.Role
+	UpdatedAt    time.Time
+	CreatedAt    time.Time
 }
 
 func (r MediaRulesRepo) Create(ctx context.Context, input CreateMediaRulesInput) (MediaRulesModel, error) {
 	values := sqldb.MediaRulesInsertInput{
-		ResourceType: input.ResourceType,
-		ExitSize:     input.ExitSize,
-		Roles:        input.Roles,
+		ID:           input.ID,
+		Extensions:   input.Extensions,
+		MaxSize:      input.MaxSize,
+		AllowedRoles: input.AllowedRoles,
 		UpdatedAt:    input.UpdatedAt,
 		CreatedAt:    input.CreatedAt,
 	}
@@ -72,39 +74,43 @@ func (r MediaRulesRepo) Create(ctx context.Context, input CreateMediaRulesInput)
 		return MediaRulesModel{}, err
 	}
 
-	return createMediaRulesModel(res), nil
+	return createMediaRulesModel(res)
 }
 
 type MediaRulesUpdateInput struct {
-	ExitSize  *[]enums.ExitSize `db:"exit_size"`
-	Roles     *[]roles.Role     `db:"roles_access_update"`
-	UpdatedAt time.Time         `db:"created_at"`
+	Extensions   *[]string
+	MaxSize      *int64
+	AllowedRoles *[]roles.Role
+	UpdatedAt    time.Time
 }
 
-func (r MediaRulesRepo) Update(ctx context.Context, resourceType string, input MediaRulesUpdateInput) error {
+func (r MediaRulesRepo) Update(ctx context.Context, ID string, input MediaRulesUpdateInput) error {
 	var values sqldb.MediaRulesUpdateInput
-	if input.ExitSize != nil {
-		values.ExitSize = input.ExitSize
+	if input.Extensions != nil {
+		values.Extensions = input.Extensions
 	}
-	if input.Roles != nil {
-		values.Roles = input.Roles
+	if input.MaxSize != nil {
+		values.MaxSize = input.MaxSize
+	}
+	if input.AllowedRoles != nil {
+		values.AllowedRoles = input.AllowedRoles
 	}
 	values.UpdatedAt = input.UpdatedAt
 
-	return r.sql.Update(ctx, values)
+	return r.sql.New().FilterID(ID).Update(ctx, values)
 }
 
-func (r MediaRulesRepo) Get(ctx context.Context, resourceType string) (MediaRulesModel, error) {
-	res, err := r.sql.New().FilterResourceType(resourceType).Get(ctx)
+func (r MediaRulesRepo) Get(ctx context.Context, ID string) (MediaRulesModel, error) {
+	res, err := r.sql.New().FilterID(ID).Get(ctx)
 	if err != nil {
 		return MediaRulesModel{}, err
 	}
 
-	return createMediaRulesModel(res), nil
+	return createMediaRulesModel(res)
 }
 
-func (r MediaRulesRepo) Delete(ctx context.Context, resourceType string) error {
-	err := r.sql.New().FilterResourceType(resourceType).Delete(ctx)
+func (r MediaRulesRepo) Delete(ctx context.Context, ID string) error {
+	err := r.sql.New().FilterID(ID).Delete(ctx)
 	if err != nil {
 		return err
 	}
@@ -112,12 +118,13 @@ func (r MediaRulesRepo) Delete(ctx context.Context, resourceType string) error {
 	return nil
 }
 
-func createMediaRulesModel(input sqldb.MediaRulesModel) MediaRulesModel {
+func createMediaRulesModel(sqlRes sqldb.MediaRulesModel) (MediaRulesModel, error) {
 	return MediaRulesModel{
-		ResourceType: input.ResourceType,
-		ExitSize:     input.ExitSize,
-		Roles:        input.Roles,
-		UpdatedAt:    input.UpdatedAt,
-		CreatedAt:    input.CreatedAt,
-	}
+		ID:           sqlRes.ID,
+		Extensions:   sqlRes.Extensions,
+		MaxSize:      sqlRes.MaxSize,
+		AllowedRoles: sqlRes.AllowedRoles,
+		UpdatedAt:    sqlRes.UpdatedAt,
+		CreatedAt:    sqlRes.CreatedAt,
+	}, nil
 }

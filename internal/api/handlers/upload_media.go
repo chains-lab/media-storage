@@ -4,9 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/google/uuid"
 	"github.com/hs-zavet/comtools/httpkit"
 	"github.com/hs-zavet/comtools/httpkit/problems"
 	"github.com/hs-zavet/media-storage/internal/api/requests"
@@ -31,23 +29,14 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourcesType := chi.URLParam(r, "resource_type")
-
-	ResourcesID, err := uuid.Parse(req.Data.Attributes.ResourceId)
-	if err != nil {
-		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"resource_id": validation.NewError("resource_id", "invalid UUID format"),
-		})...)
-		return
-	}
-
 	requestToApp := app.UploadMediaRequest{
-		ResourceType: resourcesType,
-		ResourceID:   ResourcesID,
-		User:         user,
-		File:         file,
-		FileHeader:   fileHeader,
+		FileHeader: fileHeader,
+		File:       file,
+		UserID:     user.AccountID,
+		UserRole:   user.Role,
+		Category:   req.Data.Attributes.Category,
+		Resource:   req.Data.Attributes.Resource,
+		ResourceID: req.Data.Attributes.ResourceId,
 	}
 
 	res, err := h.app.UploadMedia(r.Context(), requestToApp)
@@ -75,7 +64,7 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.log.Infof("Media %s successfully uploaded by user: %s", res.ID, user.AccountID)
+	h.log.Infof("MediaModels %s successfully uploaded by user: %s", res.ID, user.AccountID)
 
 	httpkit.Render(w, responses.Media(res))
 }

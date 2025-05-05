@@ -4,14 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ResourceId** | **string** | resource id | 
-**MediaType** | **string** | content type | 
+**Resource** | **string** | media resource | 
+**ResourceId** | **string** | media resource ID | 
+**Category** | **string** | media category | 
+**OwnerId** | **string** | media owner ID | 
 
 ## Methods
 
 ### NewUploadMediaDataAttributes
 
-`func NewUploadMediaDataAttributes(resourceId string, mediaType string, ) *UploadMediaDataAttributes`
+`func NewUploadMediaDataAttributes(resource string, resourceId string, category string, ownerId string, ) *UploadMediaDataAttributes`
 
 NewUploadMediaDataAttributes instantiates a new UploadMediaDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -25,6 +27,26 @@ will change when the set of required properties is changed
 NewUploadMediaDataAttributesWithDefaults instantiates a new UploadMediaDataAttributes object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetResource
+
+`func (o *UploadMediaDataAttributes) GetResource() string`
+
+GetResource returns the Resource field if non-nil, zero value otherwise.
+
+### GetResourceOk
+
+`func (o *UploadMediaDataAttributes) GetResourceOk() (*string, bool)`
+
+GetResourceOk returns a tuple with the Resource field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetResource
+
+`func (o *UploadMediaDataAttributes) SetResource(v string)`
+
+SetResource sets Resource field to given value.
+
 
 ### GetResourceId
 
@@ -46,24 +68,44 @@ and a boolean to check if the value has been set.
 SetResourceId sets ResourceId field to given value.
 
 
-### GetMediaType
+### GetCategory
 
-`func (o *UploadMediaDataAttributes) GetMediaType() string`
+`func (o *UploadMediaDataAttributes) GetCategory() string`
 
-GetMediaType returns the MediaType field if non-nil, zero value otherwise.
+GetCategory returns the Category field if non-nil, zero value otherwise.
 
-### GetMediaTypeOk
+### GetCategoryOk
 
-`func (o *UploadMediaDataAttributes) GetMediaTypeOk() (*string, bool)`
+`func (o *UploadMediaDataAttributes) GetCategoryOk() (*string, bool)`
 
-GetMediaTypeOk returns a tuple with the MediaType field if it's non-nil, zero value otherwise
+GetCategoryOk returns a tuple with the Category field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetMediaType
+### SetCategory
 
-`func (o *UploadMediaDataAttributes) SetMediaType(v string)`
+`func (o *UploadMediaDataAttributes) SetCategory(v string)`
 
-SetMediaType sets MediaType field to given value.
+SetCategory sets Category field to given value.
+
+
+### GetOwnerId
+
+`func (o *UploadMediaDataAttributes) GetOwnerId() string`
+
+GetOwnerId returns the OwnerId field if non-nil, zero value otherwise.
+
+### GetOwnerIdOk
+
+`func (o *UploadMediaDataAttributes) GetOwnerIdOk() (*string, bool)`
+
+GetOwnerIdOk returns a tuple with the OwnerId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOwnerId
+
+`func (o *UploadMediaDataAttributes) SetOwnerId(v string)`
+
+SetOwnerId sets OwnerId field to given value.
 
 
 

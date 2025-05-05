@@ -12,12 +12,12 @@ import (
 	"github.com/hs-zavet/media-storage/internal/api/responses"
 	"github.com/hs-zavet/media-storage/internal/app"
 	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/media-storage/internal/enums"
-	"github.com/hs-zavet/media-storage/resources"
 	"github.com/hs-zavet/tokens/roles"
 )
 
 func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
+	ruleID := chi.URLParam(r, "resource-category")
+
 	req, err := requests.CreateMediaRules(r)
 	if err != nil {
 		h.log.WithError(err).Warn("Error parsing request")
@@ -25,12 +25,10 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resourceType := chi.URLParam(r, "media_resource_type")
-
-	if resourceType != req.Data.Id {
-		h.log.WithError(err).Warn("Error parsing request")
+	if ruleID != req.Data.Id {
+		h.log.WithError(err).Warn("error parsing request")
 		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"media_resource_type": validation.NewError("media_resource_type", "invalid media resource id"),
+			"resource-category": validation.NewError("resource-category", "invalid resource category"),
 		})...)
 		return
 	}
@@ -44,9 +42,11 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := h.app.CreateMediaRules(r.Context(), resourceType, app.CreateMediaRulesRequest{
-		ExtSize: parseExtSize(req.Data.Attributes.ExitSize),
-		Roles:   curRoles,
+	res, err := h.app.CreateMediaRules(r.Context(), app.CreateMediaRulesRequest{
+		ID:         ruleID,
+		Extensions: req.Data.Attributes.Extensions,
+		MaxSize:    req.Data.Attributes.MaxSize,
+		Roles:      curRoles,
 	})
 	if err != nil {
 		switch {
@@ -55,7 +55,7 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 		default:
 			httpkit.RenderErr(w, problems.InternalError())
 		}
-		h.log.WithError(err).Errorf("error create media rule %s", resourceType)
+		h.log.WithError(err).Errorf("error create media rule %s", err)
 		return
 	}
 
@@ -63,25 +63,13 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseRoles(r []string) ([]roles.Role, error) {
-	parsedRoles := make([]roles.Role, 0, len(r))
-	for i, role := range r {
-		parsedRole, err := roles.ParseRole(role)
+	parsedRoles := make([]roles.Role, len(r)) // length = len(r)
+	for i, str := range r {
+		pr, err := roles.ParseRole(str)
 		if err != nil {
 			return nil, err
 		}
-		parsedRoles[i] = parsedRole
+		parsedRoles[i] = pr
 	}
 	return parsedRoles, nil
-}
-
-func parseExtSize(extSize []resources.ExitSizeInner) []enums.ExitSize {
-	parsedExtSize := make([]enums.ExitSize, 0, len(extSize))
-	for i, el := range extSize {
-		parsedSize := enums.ExitSize{
-			Size: el.Size,
-			Exit: el.Exit,
-		}
-		parsedExtSize[i] = parsedSize
-	}
-	return parsedExtSize
 }
