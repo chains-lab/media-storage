@@ -4,9 +4,9 @@ import (
 	"context"
 	"io"
 
+	"github.com/chains-lab/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/repo"
 	"github.com/google/uuid"
-	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/media-storage/internal/repo"
 )
 
 type repoMedia interface {

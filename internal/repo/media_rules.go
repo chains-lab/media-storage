@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/media-storage/internal/repo/sqldb"
-	"github.com/hs-zavet/tokens/roles"
+	"github.com/chains-lab/gatekit/roles"
+	"github.com/chains-lab/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/repo/sqldb"
 )
 
 type MediaRulesModel struct {

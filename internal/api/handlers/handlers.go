@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/config"
 	"github.com/google/uuid"
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/internal/config"
 	"github.com/sirupsen/logrus"
 )
 

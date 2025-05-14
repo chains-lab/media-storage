@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/hs-zavet/media-storage/internal/api"
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/api"
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/config"
 	"github.com/sirupsen/logrus"
 )
 

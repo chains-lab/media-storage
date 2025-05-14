@@ -9,9 +9,8 @@ import (
 	"syscall"
 
 	"github.com/alecthomas/kingpin"
-	"github.com/hs-zavet/comtools/logkit"
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/config"
 )
 
 func Run(args []string) bool {
@@ -20,7 +19,7 @@ func Run(args []string) bool {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	logger := logkit.SetupLogger(cfg.Server.Log.Level, cfg.Server.Log.Format)
+	logger := config.SetupLogger(cfg.Server.Log.Level, cfg.Server.Log.Format)
 	logger.Info("Starting server...")
 
 	var (

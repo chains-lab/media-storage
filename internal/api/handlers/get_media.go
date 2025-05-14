@@ -4,21 +4,22 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/chains-lab/gatekit/httpkit"
+	"github.com/chains-lab/media-storage/internal/api/responses"
+	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/go-chi/chi/v5"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
-	"github.com/hs-zavet/comtools/httpkit"
-	"github.com/hs-zavet/comtools/httpkit/problems"
-	"github.com/hs-zavet/media-storage/internal/api/responses"
-	"github.com/hs-zavet/media-storage/internal/app/ape"
 )
 
 func (h *Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
 	mediaId, err := uuid.Parse(chi.URLParam(r, "media_id"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"media_id": validation.NewError("media_id", "invalid UUID format"),
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status:   http.StatusBadRequest,
+			Title:    "error parsing media_id",
+			Error:    err,
+			Parametr: "media_id",
 		})...)
 		return
 	}
@@ -27,9 +28,14 @@ func (h *Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaNotFound):
-			httpkit.RenderErr(w, problems.NotFound("media not found"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusNotFound,
+				Title:  "Media not found",
+			})...)
 		default:
-			httpkit.RenderErr(w, problems.InternalError())
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusInternalServerError,
+			})...)
 		}
 
 		h.log.WithError(err).Error("error getting media")

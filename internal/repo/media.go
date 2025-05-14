@@ -7,10 +7,10 @@ import (
 	"io"
 	"time"
 
+	"github.com/chains-lab/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/repo/aws"
+	"github.com/chains-lab/media-storage/internal/repo/sqldb"
 	"github.com/google/uuid"
-	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/media-storage/internal/repo/aws"
-	"github.com/hs-zavet/media-storage/internal/repo/sqldb"
 )
 
 const (

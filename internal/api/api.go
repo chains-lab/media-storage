@@ -5,12 +5,12 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/chains-lab/gatekit/roles"
+	"github.com/chains-lab/gatekit/tokens"
+	"github.com/chains-lab/media-storage/internal/api/handlers"
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/config"
 	"github.com/go-chi/chi/v5"
-	"github.com/hs-zavet/media-storage/internal/api/handlers"
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/tokens"
-	"github.com/hs-zavet/tokens/roles"
 	"github.com/sirupsen/logrus"
 )
 

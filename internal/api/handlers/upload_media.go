@@ -4,28 +4,32 @@ import (
 	"errors"
 	"net/http"
 
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hs-zavet/comtools/httpkit"
-	"github.com/hs-zavet/comtools/httpkit/problems"
-	"github.com/hs-zavet/media-storage/internal/api/requests"
-	"github.com/hs-zavet/media-storage/internal/api/responses"
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/tokens"
+	"github.com/chains-lab/gatekit/httpkit"
+	"github.com/chains-lab/gatekit/tokens"
+	"github.com/chains-lab/media-storage/internal/api/requests"
+	"github.com/chains-lab/media-storage/internal/api/responses"
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/app/ape"
 )
 
 func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	user, err := tokens.GetAccountTokenData(r.Context())
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(err)...)
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status: http.StatusUnauthorized,
+			Title:  "unauthorized",
+		})...)
 		return
 	}
 
 	req, file, fileHeader, err := requests.UploadMedia(r)
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(err)...)
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status: http.StatusBadRequest,
+			Error:  err,
+		})...)
 		return
 	}
 
@@ -43,21 +47,34 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaNotFound):
-			httpkit.RenderErr(w, problems.NotFound("media not found"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusNotFound,
+				Title:  "Media not found",
+			})...)
 		case errors.Is(err, ape.ErrMediaRulesNotFound):
-			httpkit.RenderErr(w, problems.NotFound("media rules for this media type not found"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusNotFound,
+				Title:  "Media rules not found",
+			})...)
 		case errors.Is(err, ape.ErrFileToLarge):
-			httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-				"upload_data": validation.NewError("file", "file too large"),
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusBadRequest,
+				Title:  "file to large",
 			})...)
 		case errors.Is(err, ape.ErrFileFormatNotAllowed):
-			httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-				"upload_data": validation.NewError("file", "file format not allowed"),
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusBadRequest,
+				Title:  "file format is not allowed",
 			})...)
 		case errors.Is(err, ape.ErrUserNotAllowedToUploadMedia):
-			httpkit.RenderErr(w, problems.Forbidden("user role not allowed to upload this type media"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusForbidden,
+				Title:  "User not allowed to upload media",
+			})...)
 		default:
-			httpkit.RenderErr(w, problems.InternalError())
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusInternalServerError,
+			})...)
 		}
 
 		h.log.WithError(err).Errorf("error uploading media")

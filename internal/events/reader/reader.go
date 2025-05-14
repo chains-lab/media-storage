@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/hs-zavet/media-storage/internal/events"
+	"github.com/chains-lab/media-storage/internal/events"
 	"github.com/segmentio/kafka-go"
 )
 

@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/chains-lab/gatekit/roles"
+	"github.com/chains-lab/media-storage/internal/app/ape"
+	"github.com/chains-lab/media-storage/internal/repo"
 	"github.com/google/uuid"
-	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/media-storage/internal/repo"
-	"github.com/hs-zavet/tokens/roles"
 )
 
 type MediaModels struct {

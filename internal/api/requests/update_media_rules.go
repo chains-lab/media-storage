@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/chains-lab/gatekit/jsonkit"
+	"github.com/chains-lab/media-storage/resources"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hs-zavet/comtools/jsonkit"
-	"github.com/hs-zavet/media-storage/resources"
 )
 
 func UpdateMediaRules(r *http.Request) (req resources.UpdateMediaRules, err error) {

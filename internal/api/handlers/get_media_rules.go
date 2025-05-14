@@ -4,11 +4,10 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/chains-lab/gatekit/httpkit"
+	"github.com/chains-lab/media-storage/internal/api/responses"
+	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/go-chi/chi/v5"
-	"github.com/hs-zavet/comtools/httpkit"
-	"github.com/hs-zavet/comtools/httpkit/problems"
-	"github.com/hs-zavet/media-storage/internal/api/responses"
-	"github.com/hs-zavet/media-storage/internal/app/ape"
 )
 
 func (h *Handler) GetMediaRules(w http.ResponseWriter, r *http.Request) {
@@ -18,9 +17,14 @@ func (h *Handler) GetMediaRules(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaRulesNotFound):
-			httpkit.RenderErr(w, problems.NotFound("media rules not found"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusNotFound,
+				Title:  "Media rules not found",
+			})...)
 		default:
-			httpkit.RenderErr(w, problems.InternalError())
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusInternalServerError,
+			})...)
 		}
 		h.log.WithError(err).Error("Error getting media rules")
 		return

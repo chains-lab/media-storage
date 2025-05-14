@@ -4,29 +4,33 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/chains-lab/gatekit/httpkit"
+	"github.com/chains-lab/gatekit/tokens"
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/go-chi/chi/v5"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/google/uuid"
-	"github.com/hs-zavet/comtools/httpkit"
-	"github.com/hs-zavet/comtools/httpkit/problems"
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/tokens"
 )
 
 func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 	user, err := tokens.GetAccountTokenData(r.Context())
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(err)...)
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status: http.StatusUnauthorized,
+			Title:  "unauthorized",
+		})...)
 		return
 	}
 
 	mediaID, err := uuid.Parse(chi.URLParam(r, "media_id"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"media_id": validation.NewError("media_id", "invalid UUID format"),
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status:   http.StatusBadRequest,
+			Title:    "error parsing media_id",
+			Error:    err,
+			Parametr: "media_id",
 		})...)
 		return
 	}
@@ -40,13 +44,24 @@ func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaNotFound):
-			httpkit.RenderErr(w, problems.NotFound("media not found"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusNotFound,
+				Title:  "Media not found",
+			})...)
 		case errors.Is(err, ape.ErrMediaRulesNotFound):
-			httpkit.RenderErr(w, problems.NotFound("media rules for this media type not found"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusNotFound,
+				Title:  "Media rules not found",
+			})...)
 		case errors.Is(err, ape.ErrUserNotAllowedToDeleteMedia):
-			httpkit.RenderErr(w, problems.Forbidden("user not allowed to delete media"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusForbidden,
+				Title:  "User not allowed to delete media",
+			})...)
 		default:
-			httpkit.RenderErr(w, problems.InternalError())
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusInternalServerError,
+			})...)
 		}
 
 		h.log.WithError(err).Error("Error deleting media")

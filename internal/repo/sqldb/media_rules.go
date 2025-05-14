@@ -7,7 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/hs-zavet/tokens/roles"
+	"github.com/chains-lab/gatekit/roles"
 	"github.com/lib/pq"
 )
 

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/chains-lab/gatekit/jsonkit"
+	"github.com/chains-lab/media-storage/resources"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hs-zavet/comtools/jsonkit"
-	"github.com/hs-zavet/media-storage/resources"
 )
 
 // UploadMedia парсит JSONAPI запрос из тела или из multipart-формы (поле upload_data)

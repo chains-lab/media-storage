@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/media-storage/internal/repo"
-	"github.com/hs-zavet/tokens/roles"
+	"github.com/chains-lab/gatekit/roles"
+	"github.com/chains-lab/media-storage/internal/app/ape"
+	"github.com/chains-lab/media-storage/internal/repo"
 )
 
 type MediaRulesModel struct {

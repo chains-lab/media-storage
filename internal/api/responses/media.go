@@ -1,8 +1,8 @@
 package responses
 
 import (
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/resources"
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/resources"
 )
 
 func Media(media app.MediaModels) resources.Media {

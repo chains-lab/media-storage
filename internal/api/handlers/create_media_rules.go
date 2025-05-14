@@ -2,17 +2,14 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/chains-lab/media-storage/internal/api/requests"
+	"github.com/chains-lab/media-storage/internal/api/responses"
+	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/go-chi/chi/v5"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hs-zavet/comtools/httpkit"
-	"github.com/hs-zavet/comtools/httpkit/problems"
-	"github.com/hs-zavet/media-storage/internal/api/requests"
-	"github.com/hs-zavet/media-storage/internal/api/responses"
-	"github.com/hs-zavet/media-storage/internal/app"
-	"github.com/hs-zavet/media-storage/internal/app/ape"
-	"github.com/hs-zavet/tokens/roles"
 )
 
 func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
@@ -21,14 +18,21 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.CreateMediaRules(r)
 	if err != nil {
 		h.log.WithError(err).Warn("Error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(err)...)
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status: http.StatusBadRequest,
+			Error:  err,
+		})...)
 		return
 	}
 
 	if ruleID != req.Data.Id {
 		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"resource-category": validation.NewError("resource-category", "invalid resource category"),
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status:   http.StatusBadRequest,
+			Title:    "resource-category does not match id",
+			Error:    fmt.Errorf("resource-category %s does not match id %s", ruleID, req.Data.Id),
+			Parametr: "id",
+			Pointer:  "/data/id",
 		})...)
 		return
 	}
@@ -36,8 +40,11 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 	curRoles, err := parseRoles(req.Data.Attributes.Roles)
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
-		httpkit.RenderErr(w, problems.BadRequest(validation.Errors{
-			"roles": validation.NewError("roles", "invalid role"),
+		httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+			Status:  http.StatusBadRequest,
+			Title:   "error parsing roles",
+			Error:   err,
+			Pointer: "/data/attributes/roles",
 		})...)
 		return
 	}
@@ -51,9 +58,14 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, ape.ErrMediaRulesAlreadyExists):
-			httpkit.RenderErr(w, problems.Forbidden("media rules already exists"))
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusConflict,
+				Title:  "Media rules already exists",
+			})...)
 		default:
-			httpkit.RenderErr(w, problems.InternalError())
+			httpkit.ResponseError(w, httpkit.ResponseError(httpkit.ReponseErrorInput{
+				Status: http.StatusInternalServerError,
+			})...)
 		}
 		h.log.WithError(err).Errorf("error create media rule %s", err)
 		return
@@ -63,7 +75,7 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseRoles(r []string) ([]roles.Role, error) {
-	parsedRoles := make([]roles.Role, len(r)) // length = len(r)
+	parsedRoles := make([]roles.Role, len(r))
 	for i, str := range r {
 		pr, err := roles.ParseRole(str)
 		if err != nil {

@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/hs-zavet/media-storage/internal/config"
-	"github.com/hs-zavet/media-storage/internal/events"
+	"github.com/chains-lab/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/events"
 	"github.com/segmentio/kafka-go"
 )
 
