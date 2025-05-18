@@ -8,12 +8,11 @@ import (
 	"github.com/chains-lab/gatekit/httpkit"
 	"github.com/chains-lab/media-storage/internal/api/requests"
 	"github.com/chains-lab/media-storage/internal/api/responses"
-	"github.com/chains-lab/media-storage/internal/app"
 	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/go-chi/chi/v5"
 )
 
-func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
+func (h Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
 	ruleID := chi.URLParam(r, "resource-category")
 
 	req, err := requests.UpdateMediaRules(r)
@@ -38,7 +37,7 @@ func (h *Handler) UpdateMediaRules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var updateReq app.UpdateMediaRulesRequest
+	var updateReq domain.UpdateMediaRulesRequest
 	if req.Data.Attributes.Roles != nil {
 		curRoles, err := parseRoles(req.Data.Attributes.Roles)
 		if err != nil {

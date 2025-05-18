@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (h *Handler) DeleteMediaRules(w http.ResponseWriter, r *http.Request) {
+func (h Handler) DeleteMediaRules(w http.ResponseWriter, r *http.Request) {
 	ruleID := chi.URLParam(r, "resource-category")
 
 	err := h.app.DeleteMediaRules(r.Context(), ruleID)

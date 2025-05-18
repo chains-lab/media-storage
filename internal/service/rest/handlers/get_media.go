@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
+func (h Handler) GetMedia(w http.ResponseWriter, r *http.Request) {
 	mediaId, err := uuid.Parse(chi.URLParam(r, "media_id"))
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")

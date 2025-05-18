@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (h *Handler) GetMediaRules(w http.ResponseWriter, r *http.Request) {
+func (h Handler) GetMediaRules(w http.ResponseWriter, r *http.Request) {
 	ruleID := chi.URLParam(r, "resource-category")
 
 	res, err := h.app.GetMediaRules(r.Context(), ruleID)

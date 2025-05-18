@@ -5,7 +5,7 @@ import (
 	"github.com/chains-lab/media-storage/resources"
 )
 
-func MediaRules(mediaRules app.MediaRulesModel) resources.MediaRules {
+func MediaRules(mediaRules domain.MediaRulesModel) resources.MediaRules {
 	roles := make([]string, 0, len(mediaRules.AllowedRoles))
 	for _, role := range mediaRules.AllowedRoles {
 		roles = append(roles, string(role))

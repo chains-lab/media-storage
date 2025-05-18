@@ -8,11 +8,10 @@ import (
 	"github.com/chains-lab/gatekit/tokens"
 	"github.com/chains-lab/media-storage/internal/api/requests"
 	"github.com/chains-lab/media-storage/internal/api/responses"
-	"github.com/chains-lab/media-storage/internal/app"
 	"github.com/chains-lab/media-storage/internal/app/ape"
 )
 
-func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
+func (h Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	user, err := tokens.GetAccountTokenData(r.Context())
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
@@ -33,7 +32,7 @@ func (h *Handler) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestToApp := app.UploadMediaRequest{
+	requestToApp := domain.UploadMediaRequest{
 		FileHeader: fileHeader,
 		File:       file,
 		UserID:     user.AccountID,

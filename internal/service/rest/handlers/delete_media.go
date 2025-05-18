@@ -6,13 +6,12 @@ import (
 
 	"github.com/chains-lab/gatekit/httpkit"
 	"github.com/chains-lab/gatekit/tokens"
-	"github.com/chains-lab/media-storage/internal/app"
 	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
-func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
+func (h Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 	user, err := tokens.GetAccountTokenData(r.Context())
 	if err != nil {
 		h.log.WithError(err).Warn("error parsing request")
@@ -35,7 +34,7 @@ func (h *Handler) DeleteMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.app.DeleteMedia(r.Context(), app.DeleteMediaRequest{
+	err = h.app.DeleteMedia(r.Context(), domain.DeleteMediaRequest{
 		UserID:      user.AccountID,
 		UserRole:    user.Role,
 		MediaID:     mediaID,

@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/chains-lab/gatekit/httpkit"
+	"github.com/chains-lab/gatekit/roles"
 	"github.com/chains-lab/media-storage/internal/api/requests"
 	"github.com/chains-lab/media-storage/internal/api/responses"
-	"github.com/chains-lab/media-storage/internal/app"
 	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/go-chi/chi/v5"
 )
 
-func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
+func (h Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 	ruleID := chi.URLParam(r, "resource-category")
 
 	req, err := requests.CreateMediaRules(r)
@@ -49,7 +50,7 @@ func (h *Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := h.app.CreateMediaRules(r.Context(), app.CreateMediaRulesRequest{
+	res, err := h.app.CreateMediaRules(r.Context(), domain.CreateMediaRulesRequest{
 		ID:         ruleID,
 		Extensions: req.Data.Attributes.Extensions,
 		MaxSize:    req.Data.Attributes.MaxSize,

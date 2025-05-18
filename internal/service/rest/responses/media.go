@@ -5,7 +5,7 @@ import (
 	"github.com/chains-lab/media-storage/resources"
 )
 
-func Media(media app.MediaModels) resources.Media {
+func Media(media domain.MediaModels) resources.Media {
 	attributes := resources.MediaAttributes{
 		Format:     media.Format,
 		Extension:  media.Extension,

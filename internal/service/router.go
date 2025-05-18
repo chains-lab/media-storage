@@ -1,51 +1,19 @@
-package api
+package service
 
 import (
 	"context"
 	"errors"
 	"net/http"
 
+	"github.com/chains-lab/gatekit/mdlv"
 	"github.com/chains-lab/gatekit/roles"
-	"github.com/chains-lab/gatekit/tokens"
-	"github.com/chains-lab/media-storage/internal/api/handlers"
-	"github.com/chains-lab/media-storage/internal/app"
-	"github.com/chains-lab/media-storage/internal/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 )
 
-type Api struct {
-	server   *http.Server
-	router   *chi.Mux
-	handlers handlers.Handler
-
-	log *logrus.Entry
-	cfg config.Config
-}
-
-func NewAPI(cfg config.Config, log *logrus.Logger, app *app.App) Api {
-	logger := log.WithField("module", "api")
-	router := chi.NewRouter()
-	server := &http.Server{
-		Addr:    cfg.Server.Port,
-		Handler: router,
-	}
-
-	hands := handlers.NewHandlers(cfg, logger, app)
-
-	return Api{
-		server:   server,
-		router:   router,
-		handlers: hands,
-
-		log: logger,
-		cfg: cfg,
-	}
-}
-
 func (a *Api) Run(ctx context.Context, log *logrus.Logger) {
-	auth := tokens.AuthMdl(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey)
-	adminGrant := tokens.AccessGrant(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey, roles.Admin, roles.SuperUser)
+	auth := mdlv.AuthMdl(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey)
+	adminGrant := mdlv.AccessGrant(a.cfg.JWT.AccessToken.SecretKey, a.cfg.JWT.ServiceToken.SecretKey, roles.Admin, roles.SuperUser)
 
 	a.router.Route("/hs-news/media-storage", func(r chi.Router) {
 		r.Route("/v1", func(r chi.Router) {
