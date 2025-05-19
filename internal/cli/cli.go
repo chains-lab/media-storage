@@ -31,7 +31,7 @@ func Run(args []string) bool {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	application, err := domain.NewApp(cfg)
+	application, err := app.NewApp(cfg)
 	if err != nil {
 		logger.WithError(err).Error("failed to create app")
 		return false

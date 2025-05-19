@@ -1,0 +1,34 @@
+post:
+  tags:
+    - Media
+  summary: Upload Media
+  description: Upload media to the server
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          $ref: '../spec/components/schemas/UploadMedia.yaml'
+  responses:
+    '201':
+      description: Media uploaded successfully
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '../spec/components/schemas/Media.yaml'
+    '400':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '401':
+      $ref: '../spec/components/responses/invalidAuth.yaml'
+    '404':
+      $ref: '../spec/components/responses/notFound.yaml'
+#    '413':
+#      description: File too large
+#      content:
+#        application/vnd.api+json:
+#          schema:
+#            $ref: '../spec/components/responses/invalidParameter.yaml'
+    '409':
+      $ref: '../spec/components/responses/forbidden.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'

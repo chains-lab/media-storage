@@ -1,0 +1,25 @@
+delete:
+  tags:
+    - Media
+  summary: Delete Media
+  description: Delete media from the server
+  parameters:
+    - name: media_id
+      in: path
+      required: true
+      description: The ID of the media to delete
+      schema:
+        type: string
+  responses:
+    '204':
+      description: Media deleted successfully
+    '400':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '401':
+      $ref: '../spec/components/responses/invalidAuth.yaml'
+    '403':
+      $ref: '../spec/components/responses/forbidden.yaml'
+    '404':
+      $ref: '../spec/components/responses/notFound.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'

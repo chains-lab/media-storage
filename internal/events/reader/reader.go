@@ -7,6 +7,7 @@ import (
 
 	"github.com/chains-lab/media-storage/internal/events"
 	"github.com/segmentio/kafka-go"
+	"github.com/sirupsen/logrus"
 )
 
 type Reader struct {

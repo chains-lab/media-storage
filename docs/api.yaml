@@ -1,18 +1,18 @@
-openapi: 3.1.0
+openapi: 3.0.0
 info:
   title: Title
   description: Title
   version: 1.0.0
 
 paths:
-  /test:
-    post:
-      tags:
-        - Test
-      description: Test
-      responses:
-        '201':
-          description: successfully
+  /chains/media-storage/v1/media:
+    $ref: './paths/UploadMedia.yaml'
+
+  /chains/media-storage/v1/media/:
+    $ref: './paths/Media.yaml'
+
+  /chains/media-storage/v1/media-rules/:
+    $ref: './paths/MediaRules.yaml'
 
 components:
   schemas:
@@ -39,3 +39,6 @@ components:
       $ref: './spec/components/schemas/UpdateMediaRules.yaml'
     MediaRulesCollection:
       $ref: './spec/components/schemas/MediaRulesCollection.yaml'
+
+    Errors:
+      $ref: './spec/components/schemas/Errors.yaml'
