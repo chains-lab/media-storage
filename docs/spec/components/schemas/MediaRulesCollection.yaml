@@ -1,7 +1,6 @@
 type: object
 required:
   - data
-  - links
 properties:
   data:
     type: object
@@ -11,13 +10,13 @@ properties:
     properties:
       type:
         type: string
-        enum: [ media_collection ]
+        enum: [ media_rules_collection ]
       attributes:
         type: object
         required:
-        - data
+          - data
         properties:
           data:
             type: array
             items:
-              $ref: './MediaData.yaml'
+              $ref: './MediaRulesData.yaml'

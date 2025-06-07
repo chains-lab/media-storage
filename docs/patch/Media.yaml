@@ -1,0 +1,56 @@
+delete:
+  tags:
+    - Media
+  summary: Delete Media
+  description: Delete media from the server
+  parameters:
+    - name: media_id
+      in: path
+      required: true
+      description: The ID of the media to delete
+      schema:
+        type: string
+  responses:
+    '204':
+      description: Media deleted successfully
+    '400':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '401':
+      $ref: '../spec/components/responses/invalidAuth.yaml'
+    '403':
+      $ref: '../spec/components/responses/forbidden.yaml'
+    '404':
+      $ref: '../spec/components/responses/notFound.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'
+
+post:
+  tags:
+    - Media
+  summary: Upload Media
+  description: Upload media to the server
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          $ref: '../spec/components/schemas/UploadMedia.yaml'
+  responses:
+    '201':
+      description: Media uploaded successfully
+      content:
+        application/vnd.api+json:
+          schema:
+           $ref: '../spec/components/schemas/Media.yaml'
+    '400':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '401':
+      $ref: '../spec/components/responses/invalidAuth.yaml'
+    '404':
+      $ref: '../spec/components/responses/notFound.yaml'
+    '413':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '409':
+      $ref: '../spec/components/responses/forbidden.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'

@@ -1,29 +1,40 @@
-openapi: 3.0.0
+openapi: 3.1.1
 info:
   title: Title
   description: Title
   version: 1.0.0
 
 paths:
-  /chains/media-storage/v1/media:
-    $ref: './paths/UploadMedia.yaml'
-
+  /test:
+    post:
+      tags:
+        - Test
+      description: Test
+      responses:
+        '201':
+          description: successfully
   /chains/media-storage/v1/media/:
-    $ref: './paths/Media.yaml'
-
-  /chains/media-storage/v1/media-rules/:
-    $ref: './paths/MediaRules.yaml'
+    $ref: './patch/Media.yaml'
+  /chains/media-storage/v1/media-rules/{resource}:
+    parameters:
+      - name: resource
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Идентификатор ресурсной записи
+    $ref: './patch/MediaRules.yaml'
 
 components:
   schemas:
+    MediaCollection:
+      $ref: './spec/components/schemas/MediaCollection.yaml'
     Media:
       $ref: './spec/components/schemas/Media.yaml'
     MediaData:
       $ref: './spec/components/schemas/MediaData.yaml'
     MediaAttributes:
       $ref: './spec/components/schemas/MediaAttributes.yaml'
-    MediaCollection:
-      $ref: './spec/components/schemas/MediaCollection.yaml'
     UploadMedia:
       $ref: './spec/components/schemas/UploadMedia.yaml'
 
@@ -42,3 +53,21 @@ components:
 
     Errors:
       $ref: './spec/components/schemas/Errors.yaml'
+
+  responses:
+    InvalidParameter:
+      $ref: './spec/components/responses/invalidParameter.yaml'
+    InvalidAuth:
+      $ref: './spec/components/responses/invalidAuth.yaml'
+    NotFound:
+      $ref: './spec/components/responses/notFound.yaml'
+    Forbidden:
+      $ref: './spec/components/responses/forbidden.yaml'
+    InternalError:
+      $ref: './spec/components/responses/internalError.yaml'
+    Conflict:
+      $ref: './spec/components/responses/conflict.yaml'
+    TooManyRequests:
+      $ref: './spec/components/responses/tooManyRequests.yaml'
+    UnsupportedMediaType:
+      $ref: './spec/components/responses/unsupportedMediaType.yaml'

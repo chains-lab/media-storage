@@ -2,45 +2,45 @@ package app
 
 import (
 	"context"
-	"io"
 
+	"github.com/chains-lab/media-storage/internal/app/ape"
+	"github.com/chains-lab/media-storage/internal/app/domain"
+	"github.com/chains-lab/media-storage/internal/app/models"
 	"github.com/chains-lab/media-storage/internal/config"
-	"github.com/chains-lab/media-storage/internal/repo"
 	"github.com/google/uuid"
 )
 
-type repoMedia interface {
-	UploadMedia(ctx context.Context, reader io.Reader, input repo.AddMediaInput) (repo.MediaModel, error)
-	GetMedia(ctx context.Context, mediaID uuid.UUID) (repo.MediaModel, error)
-	DeleteMedia(ctx context.Context, mediaID uuid.UUID) error
-	DeleteFilesByResourceAndCategory(ctx context.Context, resource, category string) error
+type media interface {
+	Upload(ctx context.Context, request domain.UploadMediaRequest) (models.Media, *ape.Error)
+	Get(ctx context.Context, mediaID uuid.UUID) (models.Media, *ape.Error)
+	Delete(ctx context.Context, request domain.DeleteMediaRequest) *ape.Error
 }
 
-type MediaRulesRepo interface {
-	Create(ctx context.Context, input repo.CreateMediaRulesInput) (repo.MediaRulesModel, error)
-	Get(ctx context.Context, id string) (repo.MediaRulesModel, error)
-	Update(ctx context.Context, id string, input repo.MediaRulesUpdateInput) error
-	Delete(ctx context.Context, id string) error
+type mediaRules interface {
+	Get(ctx context.Context, ID string) (models.MediaRules, *ape.Error)
+	Create(ctx context.Context, request domain.CreateMediaRulesRequest) (models.MediaRules, *ape.Error)
+	Update(ctx context.Context, ID string, request domain.UpdateMediaRulesRequest) (models.MediaRules, *ape.Error)
+	Delete(ctx context.Context, ID string) *ape.Error
 }
 
 type App struct {
-	repoMedia repoMedia
-	repoRules MediaRulesRepo
+	media media
+	rules mediaRules
 }
 
 func NewApp(cfg config.Config) (App, error) {
-	mediaRepo, err := repo.NewMedia(cfg)
+	mediaDomain, err := domain.NewMedia(cfg)
 	if err != nil {
 		return App{}, err
 	}
 
-	rulesRepo, err := repo.NewMediaRulesRepo(cfg)
+	rulesDomain, err := domain.NewMediaRules(cfg)
 	if err != nil {
 		return App{}, err
 	}
 
 	return App{
-		repoMedia: mediaRepo,
-		repoRules: rulesRepo,
+		media: mediaDomain,
+		rules: rulesDomain,
 	}, nil
 }

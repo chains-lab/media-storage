@@ -79,11 +79,12 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *MediaAPI* | [**ChainsMediaStorageV1MediaDelete**](docs/MediaAPI.md#chainsmediastoragev1mediadelete) | **Delete** /chains/media-storage/v1/media/ | Delete Media
-*MediaAPI* | [**ChainsMediaStorageV1MediaPost**](docs/MediaAPI.md#chainsmediastoragev1mediapost) | **Post** /chains/media-storage/v1/media | Upload Media
-*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesDelete**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulesdelete) | **Delete** /chains/media-storage/v1/media-rules/ | Delete Media Rules
-*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesGet**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulesget) | **Get** /chains/media-storage/v1/media-rules/ | Get Media Rules
-*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesPatch**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulespatch) | **Patch** /chains/media-storage/v1/media-rules/ | Update Media Rules
-*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesPost**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulespost) | **Post** /chains/media-storage/v1/media-rules/ | Create Media Rules
+*MediaAPI* | [**ChainsMediaStorageV1MediaPost**](docs/MediaAPI.md#chainsmediastoragev1mediapost) | **Post** /chains/media-storage/v1/media/ | Upload Media
+*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesResourceDelete**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulesresourcedelete) | **Delete** /chains/media-storage/v1/media-rules/{resource} | Delete Media Rules
+*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesResourceGet**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulesresourceget) | **Get** /chains/media-storage/v1/media-rules/{resource} | Get Media Rules
+*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesResourcePatch**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulesresourcepatch) | **Patch** /chains/media-storage/v1/media-rules/{resource} | Update Media Rules
+*MediaRulesAPI* | [**ChainsMediaStorageV1MediaRulesResourcePost**](docs/MediaRulesAPI.md#chainsmediastoragev1mediarulesresourcepost) | **Post** /chains/media-storage/v1/media-rules/{resource} | Create Media Rules
+*TestAPI* | [**TestPost**](docs/TestAPI.md#testpost) | **Post** /test | 
 
 
 ## Documentation For Models

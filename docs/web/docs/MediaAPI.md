@@ -5,7 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**ChainsMediaStorageV1MediaDelete**](MediaAPI.md#ChainsMediaStorageV1MediaDelete) | **Delete** /chains/media-storage/v1/media/ | Delete Media
-[**ChainsMediaStorageV1MediaPost**](MediaAPI.md#ChainsMediaStorageV1MediaPost) | **Post** /chains/media-storage/v1/media | Upload Media
+[**ChainsMediaStorageV1MediaPost**](MediaAPI.md#ChainsMediaStorageV1MediaPost) | **Post** /chains/media-storage/v1/media/ | Upload Media
 
 
 
@@ -70,7 +70,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Accept**: application/vnd.api+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)

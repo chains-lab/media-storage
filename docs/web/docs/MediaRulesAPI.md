@@ -4,16 +4,16 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**ChainsMediaStorageV1MediaRulesDelete**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesDelete) | **Delete** /chains/media-storage/v1/media-rules/ | Delete Media Rules
-[**ChainsMediaStorageV1MediaRulesGet**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesGet) | **Get** /chains/media-storage/v1/media-rules/ | Get Media Rules
-[**ChainsMediaStorageV1MediaRulesPatch**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesPatch) | **Patch** /chains/media-storage/v1/media-rules/ | Update Media Rules
-[**ChainsMediaStorageV1MediaRulesPost**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesPost) | **Post** /chains/media-storage/v1/media-rules/ | Create Media Rules
+[**ChainsMediaStorageV1MediaRulesResourceDelete**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesResourceDelete) | **Delete** /chains/media-storage/v1/media-rules/{resource} | Delete Media Rules
+[**ChainsMediaStorageV1MediaRulesResourceGet**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesResourceGet) | **Get** /chains/media-storage/v1/media-rules/{resource} | Get Media Rules
+[**ChainsMediaStorageV1MediaRulesResourcePatch**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesResourcePatch) | **Patch** /chains/media-storage/v1/media-rules/{resource} | Update Media Rules
+[**ChainsMediaStorageV1MediaRulesResourcePost**](MediaRulesAPI.md#ChainsMediaStorageV1MediaRulesResourcePost) | **Post** /chains/media-storage/v1/media-rules/{resource} | Create Media Rules
 
 
 
-## ChainsMediaStorageV1MediaRulesDelete
+## ChainsMediaStorageV1MediaRulesResourceDelete
 
-> ChainsMediaStorageV1MediaRulesDelete(ctx).Execute()
+> ChainsMediaStorageV1MediaRulesResourceDelete(ctx, resource).Execute()
 
 Delete Media Rules
 
@@ -32,12 +32,13 @@ import (
 )
 
 func main() {
+	resource := "resource_example" // string | Идентификатор ресурсной записи
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesDelete(context.Background()).Execute()
+	r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourceDelete(context.Background(), resource).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesDelete``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourceDelete``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -45,11 +46,19 @@ func main() {
 
 ### Path Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**resource** | **string** | Идентификатор ресурсной записи | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesDeleteRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesResourceDeleteRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
 
 
 ### Return type
@@ -70,9 +79,9 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## ChainsMediaStorageV1MediaRulesGet
+## ChainsMediaStorageV1MediaRulesResourceGet
 
-> MediaRules ChainsMediaStorageV1MediaRulesGet(ctx).Execute()
+> MediaRules ChainsMediaStorageV1MediaRulesResourceGet(ctx, resource).Execute()
 
 Get Media Rules
 
@@ -91,26 +100,35 @@ import (
 )
 
 func main() {
+	resource := "resource_example" // string | Идентификатор ресурсной записи
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesGet(context.Background()).Execute()
+	resp, r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourceGet(context.Background(), resource).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourceGet``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
-	// response from `ChainsMediaStorageV1MediaRulesGet`: MediaRules
-	fmt.Fprintf(os.Stdout, "Response from `MediaRulesAPI.ChainsMediaStorageV1MediaRulesGet`: %v\n", resp)
+	// response from `ChainsMediaStorageV1MediaRulesResourceGet`: MediaRules
+	fmt.Fprintf(os.Stdout, "Response from `MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourceGet`: %v\n", resp)
 }
 ```
 
 ### Path Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**resource** | **string** | Идентификатор ресурсной записи | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesGetRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesResourceGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
 
 
 ### Return type
@@ -131,9 +149,9 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## ChainsMediaStorageV1MediaRulesPatch
+## ChainsMediaStorageV1MediaRulesResourcePatch
 
-> MediaRules ChainsMediaStorageV1MediaRulesPatch(ctx).UpdateMediaRules(updateMediaRules).Execute()
+> MediaRules ChainsMediaStorageV1MediaRulesResourcePatch(ctx, resource).UpdateMediaRules(updateMediaRules).Execute()
 
 Update Media Rules
 
@@ -152,31 +170,37 @@ import (
 )
 
 func main() {
+	resource := "resource_example" // string | Идентификатор ресурсной записи
 	updateMediaRules := *openapiclient.NewUpdateMediaRules(*openapiclient.NewUpdateMediaRulesData("Id_example", "Type_example", *openapiclient.NewUpdateMediaRulesDataAttributes())) // UpdateMediaRules | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesPatch(context.Background()).UpdateMediaRules(updateMediaRules).Execute()
+	resp, r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourcePatch(context.Background(), resource).UpdateMediaRules(updateMediaRules).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesPatch``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourcePatch``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
-	// response from `ChainsMediaStorageV1MediaRulesPatch`: MediaRules
-	fmt.Fprintf(os.Stdout, "Response from `MediaRulesAPI.ChainsMediaStorageV1MediaRulesPatch`: %v\n", resp)
+	// response from `ChainsMediaStorageV1MediaRulesResourcePatch`: MediaRules
+	fmt.Fprintf(os.Stdout, "Response from `MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourcePatch`: %v\n", resp)
 }
 ```
 
 ### Path Parameters
 
 
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**resource** | **string** | Идентификатор ресурсной записи | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesPatchRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesResourcePatchRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+
  **updateMediaRules** | [**UpdateMediaRules**](UpdateMediaRules.md) |  | 
 
 ### Return type
@@ -197,9 +221,9 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## ChainsMediaStorageV1MediaRulesPost
+## ChainsMediaStorageV1MediaRulesResourcePost
 
-> MediaRules ChainsMediaStorageV1MediaRulesPost(ctx).CreateMediaRules(createMediaRules).Execute()
+> MediaRules ChainsMediaStorageV1MediaRulesResourcePost(ctx, resource).CreateMediaRules(createMediaRules).Execute()
 
 Create Media Rules
 
@@ -218,31 +242,37 @@ import (
 )
 
 func main() {
+	resource := "resource_example" // string | Идентификатор ресурсной записи
 	createMediaRules := *openapiclient.NewCreateMediaRules(*openapiclient.NewCreateMediaRulesData("Id_example", "Type_example", *openapiclient.NewCreateMediaRulesDataAttributes([]string{"Extensions_example"}, int64(123), []string{"Roles_example"}))) // CreateMediaRules | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesPost(context.Background()).CreateMediaRules(createMediaRules).Execute()
+	resp, r, err := apiClient.MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourcePost(context.Background(), resource).CreateMediaRules(createMediaRules).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourcePost``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
-	// response from `ChainsMediaStorageV1MediaRulesPost`: MediaRules
-	fmt.Fprintf(os.Stdout, "Response from `MediaRulesAPI.ChainsMediaStorageV1MediaRulesPost`: %v\n", resp)
+	// response from `ChainsMediaStorageV1MediaRulesResourcePost`: MediaRules
+	fmt.Fprintf(os.Stdout, "Response from `MediaRulesAPI.ChainsMediaStorageV1MediaRulesResourcePost`: %v\n", resp)
 }
 ```
 
 ### Path Parameters
 
 
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**resource** | **string** | Идентификатор ресурсной записи | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesPostRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiChainsMediaStorageV1MediaRulesResourcePostRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+
  **createMediaRules** | [**CreateMediaRules**](CreateMediaRules.md) |  | 
 
 ### Return type

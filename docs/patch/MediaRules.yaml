@@ -1,0 +1,95 @@
+post:
+  tags:
+    - Media Rules
+  summary: Create Media Rules
+  description: Create media Rules
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          $ref: '../spec/components/schemas/CreateMediaRules.yaml'
+  responses:
+    '201':
+      description: Media Rules created successfully
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '../spec/components/schemas/MediaRules.yaml'
+    '400':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '401':
+      $ref: '../spec/components/responses/invalidAuth.yaml'
+    '403':
+      $ref: '../spec/components/responses/forbidden.yaml'
+    '409':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'
+
+patch:
+  tags:
+    - Media Rules
+  summary: Update Media Rules
+  description: Update media Rules
+  requestBody:
+    required: true
+    content:
+      application/vnd.api+json:
+        schema:
+          $ref: '../spec/components/schemas/UpdateMediaRules.yaml'
+  responses:
+    '201':
+      description: Media Rules created successfully
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '../spec/components/schemas/MediaRules.yaml'
+    '400':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '401':
+      $ref: '../spec/components/responses/invalidAuth.yaml'
+    '403':
+      $ref: '../spec/components/responses/forbidden.yaml'
+    '404':
+      $ref: '../spec/components/responses/notFound.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'
+
+delete:
+  tags:
+    - Media Rules
+  summary: Delete Media Rules
+  description: Delete media Rules
+  responses:
+    '204':
+      description: Media Rules deleted successfully
+    '400':
+      $ref: "../spec/components/responses/invalidParameter.yaml"
+    '401':
+      $ref: '../spec/components/responses/invalidAuth.yaml'
+    '403':
+      $ref: '../spec/components/responses/forbidden.yaml'
+    '404':
+      $ref: '../spec/components/responses/notFound.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'
+
+get:
+  tags:
+    - Media Rules
+  summary: Get Media Rules
+  description: Get media Rules
+  responses:
+    '201':
+      description: Media Rules retrieved successfully
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '../spec/components/schemas/MediaRules.yaml'
+    '400':
+      $ref: '../spec/components/responses/invalidParameter.yaml'
+    '404':
+      $ref: '../spec/components/responses/notFound.yaml'
+    '500':
+      $ref: '../spec/components/responses/internalError.yaml'

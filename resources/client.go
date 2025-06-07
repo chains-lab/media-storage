@@ -52,6 +52,8 @@ type APIClient struct {
 	MediaAPI *MediaAPIService
 
 	MediaRulesAPI *MediaRulesAPIService
+
+	TestAPI *TestAPIService
 }
 
 type service struct {
@@ -72,6 +74,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	// API Services
 	c.MediaAPI = (*MediaAPIService)(&c.common)
 	c.MediaRulesAPI = (*MediaRulesAPIService)(&c.common)
+	c.TestAPI = (*TestAPIService)(&c.common)
 
 	return c
 }

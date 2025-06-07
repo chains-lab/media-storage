@@ -22,24 +22,24 @@ type Handlers interface {
 }
 
 type Api struct {
-	router  *chi.Mux
-	server *http.Server
+	router   *chi.Mux
+	server   *http.Server
 	handlers Handlers
 
-	log *logrus.Logger
+	log *logrus.Entry
 	cfg config.Config
 }
 
 func NewAPI(cfg config.Config, log *logrus.Logger, app *app.App) Api {
+	logger := log.WithField("module", "api")
+
 	router := chi.NewRouter()
 	server := &http.Server{
 		Addr:    cfg.Server.Port,
 		Handler: router,
 	}
 
-	logger := log
-
-	hands := handlers.NewHandlers(logger, app)
+	hands := handlers.NewHandlers(cfg, logger, app)
 
 	return Api{
 		router:   router,

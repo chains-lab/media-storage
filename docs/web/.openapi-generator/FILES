@@ -4,6 +4,7 @@ README.md
 api/openapi.yaml
 api_media.go
 api_media_rules.go
+api_test_.go
 client.go
 configuration.go
 docs/CreateMediaRules.md
@@ -26,6 +27,7 @@ docs/MediaRulesCollection.md
 docs/MediaRulesCollectionData.md
 docs/MediaRulesCollectionDataAttributes.md
 docs/MediaRulesData.md
+docs/TestAPI.md
 docs/UpdateMediaRules.md
 docs/UpdateMediaRulesData.md
 docs/UpdateMediaRulesDataAttributes.md
@@ -62,4 +64,5 @@ model_upload_media_data_attributes.go
 response.go
 test/api_media_rules_test.go
 test/api_media_test.go
+test/api_test__test.go
 utils.go

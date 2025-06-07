@@ -16,50 +16,55 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 
 // MediaRulesAPIService MediaRulesAPI service
 type MediaRulesAPIService service
 
-type ApiChainsMediaStorageV1MediaRulesDeleteRequest struct {
+type ApiChainsMediaStorageV1MediaRulesResourceDeleteRequest struct {
 	ctx context.Context
 	ApiService *MediaRulesAPIService
+	resource string
 }
 
-func (r ApiChainsMediaStorageV1MediaRulesDeleteRequest) Execute() (*http.Response, error) {
-	return r.ApiService.ChainsMediaStorageV1MediaRulesDeleteExecute(r)
+func (r ApiChainsMediaStorageV1MediaRulesResourceDeleteRequest) Execute() (*http.Response, error) {
+	return r.ApiService.ChainsMediaStorageV1MediaRulesResourceDeleteExecute(r)
 }
 
 /*
-ChainsMediaStorageV1MediaRulesDelete Delete Media Rules
+ChainsMediaStorageV1MediaRulesResourceDelete Delete Media Rules
 
 Delete media Rules
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiChainsMediaStorageV1MediaRulesDeleteRequest
+ @param resource Идентификатор ресурсной записи
+ @return ApiChainsMediaStorageV1MediaRulesResourceDeleteRequest
 */
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDelete(ctx context.Context) ApiChainsMediaStorageV1MediaRulesDeleteRequest {
-	return ApiChainsMediaStorageV1MediaRulesDeleteRequest{
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourceDelete(ctx context.Context, resource string) ApiChainsMediaStorageV1MediaRulesResourceDeleteRequest {
+	return ApiChainsMediaStorageV1MediaRulesResourceDeleteRequest{
 		ApiService: a,
 		ctx: ctx,
+		resource: resource,
 	}
 }
 
 // Execute executes the request
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDeleteExecute(r ApiChainsMediaStorageV1MediaRulesDeleteRequest) (*http.Response, error) {
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourceDeleteExecute(r ApiChainsMediaStorageV1MediaRulesResourceDeleteRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete
 		localVarPostBody     interface{}
 		formFiles            []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesDelete")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesResourceDelete")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/"
+	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/{resource}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource"+"}", url.PathEscape(parameterValueToString(r.resource, "resource")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -105,7 +110,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDeleteExecute(r Api
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -116,7 +121,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDeleteExecute(r Api
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -127,7 +132,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDeleteExecute(r Api
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -138,7 +143,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDeleteExecute(r Api
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -149,7 +154,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDeleteExecute(r Api
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -164,33 +169,36 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesDeleteExecute(r Api
 	return localVarHTTPResponse, nil
 }
 
-type ApiChainsMediaStorageV1MediaRulesGetRequest struct {
+type ApiChainsMediaStorageV1MediaRulesResourceGetRequest struct {
 	ctx context.Context
 	ApiService *MediaRulesAPIService
+	resource string
 }
 
-func (r ApiChainsMediaStorageV1MediaRulesGetRequest) Execute() (*MediaRules, *http.Response, error) {
-	return r.ApiService.ChainsMediaStorageV1MediaRulesGetExecute(r)
+func (r ApiChainsMediaStorageV1MediaRulesResourceGetRequest) Execute() (*MediaRules, *http.Response, error) {
+	return r.ApiService.ChainsMediaStorageV1MediaRulesResourceGetExecute(r)
 }
 
 /*
-ChainsMediaStorageV1MediaRulesGet Get Media Rules
+ChainsMediaStorageV1MediaRulesResourceGet Get Media Rules
 
 Get media Rules
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiChainsMediaStorageV1MediaRulesGetRequest
+ @param resource Идентификатор ресурсной записи
+ @return ApiChainsMediaStorageV1MediaRulesResourceGetRequest
 */
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesGet(ctx context.Context) ApiChainsMediaStorageV1MediaRulesGetRequest {
-	return ApiChainsMediaStorageV1MediaRulesGetRequest{
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourceGet(ctx context.Context, resource string) ApiChainsMediaStorageV1MediaRulesResourceGetRequest {
+	return ApiChainsMediaStorageV1MediaRulesResourceGetRequest{
 		ApiService: a,
 		ctx: ctx,
+		resource: resource,
 	}
 }
 
 // Execute executes the request
 //  @return MediaRules
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesGetExecute(r ApiChainsMediaStorageV1MediaRulesGetRequest) (*MediaRules, *http.Response, error) {
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourceGetExecute(r ApiChainsMediaStorageV1MediaRulesResourceGetRequest) (*MediaRules, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -198,12 +206,13 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesGetExecute(r ApiCha
 		localVarReturnValue  *MediaRules
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesGet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesResourceGet")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/"
+	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/{resource}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource"+"}", url.PathEscape(parameterValueToString(r.resource, "resource")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -249,7 +258,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesGetExecute(r ApiCha
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -260,7 +269,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesGetExecute(r ApiCha
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -271,7 +280,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesGetExecute(r ApiCha
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -295,39 +304,42 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesGetExecute(r ApiCha
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiChainsMediaStorageV1MediaRulesPatchRequest struct {
+type ApiChainsMediaStorageV1MediaRulesResourcePatchRequest struct {
 	ctx context.Context
 	ApiService *MediaRulesAPIService
+	resource string
 	updateMediaRules *UpdateMediaRules
 }
 
-func (r ApiChainsMediaStorageV1MediaRulesPatchRequest) UpdateMediaRules(updateMediaRules UpdateMediaRules) ApiChainsMediaStorageV1MediaRulesPatchRequest {
+func (r ApiChainsMediaStorageV1MediaRulesResourcePatchRequest) UpdateMediaRules(updateMediaRules UpdateMediaRules) ApiChainsMediaStorageV1MediaRulesResourcePatchRequest {
 	r.updateMediaRules = &updateMediaRules
 	return r
 }
 
-func (r ApiChainsMediaStorageV1MediaRulesPatchRequest) Execute() (*MediaRules, *http.Response, error) {
-	return r.ApiService.ChainsMediaStorageV1MediaRulesPatchExecute(r)
+func (r ApiChainsMediaStorageV1MediaRulesResourcePatchRequest) Execute() (*MediaRules, *http.Response, error) {
+	return r.ApiService.ChainsMediaStorageV1MediaRulesResourcePatchExecute(r)
 }
 
 /*
-ChainsMediaStorageV1MediaRulesPatch Update Media Rules
+ChainsMediaStorageV1MediaRulesResourcePatch Update Media Rules
 
 Update media Rules
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiChainsMediaStorageV1MediaRulesPatchRequest
+ @param resource Идентификатор ресурсной записи
+ @return ApiChainsMediaStorageV1MediaRulesResourcePatchRequest
 */
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatch(ctx context.Context) ApiChainsMediaStorageV1MediaRulesPatchRequest {
-	return ApiChainsMediaStorageV1MediaRulesPatchRequest{
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourcePatch(ctx context.Context, resource string) ApiChainsMediaStorageV1MediaRulesResourcePatchRequest {
+	return ApiChainsMediaStorageV1MediaRulesResourcePatchRequest{
 		ApiService: a,
 		ctx: ctx,
+		resource: resource,
 	}
 }
 
 // Execute executes the request
 //  @return MediaRules
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiChainsMediaStorageV1MediaRulesPatchRequest) (*MediaRules, *http.Response, error) {
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourcePatchExecute(r ApiChainsMediaStorageV1MediaRulesResourcePatchRequest) (*MediaRules, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPatch
 		localVarPostBody     interface{}
@@ -335,12 +347,13 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiC
 		localVarReturnValue  *MediaRules
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesPatch")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesResourcePatch")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/"
+	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/{resource}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource"+"}", url.PathEscape(parameterValueToString(r.resource, "resource")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -391,7 +404,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiC
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -402,7 +415,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiC
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -413,7 +426,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiC
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -424,7 +437,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiC
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -435,7 +448,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiC
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -459,39 +472,42 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPatchExecute(r ApiC
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiChainsMediaStorageV1MediaRulesPostRequest struct {
+type ApiChainsMediaStorageV1MediaRulesResourcePostRequest struct {
 	ctx context.Context
 	ApiService *MediaRulesAPIService
+	resource string
 	createMediaRules *CreateMediaRules
 }
 
-func (r ApiChainsMediaStorageV1MediaRulesPostRequest) CreateMediaRules(createMediaRules CreateMediaRules) ApiChainsMediaStorageV1MediaRulesPostRequest {
+func (r ApiChainsMediaStorageV1MediaRulesResourcePostRequest) CreateMediaRules(createMediaRules CreateMediaRules) ApiChainsMediaStorageV1MediaRulesResourcePostRequest {
 	r.createMediaRules = &createMediaRules
 	return r
 }
 
-func (r ApiChainsMediaStorageV1MediaRulesPostRequest) Execute() (*MediaRules, *http.Response, error) {
-	return r.ApiService.ChainsMediaStorageV1MediaRulesPostExecute(r)
+func (r ApiChainsMediaStorageV1MediaRulesResourcePostRequest) Execute() (*MediaRules, *http.Response, error) {
+	return r.ApiService.ChainsMediaStorageV1MediaRulesResourcePostExecute(r)
 }
 
 /*
-ChainsMediaStorageV1MediaRulesPost Create Media Rules
+ChainsMediaStorageV1MediaRulesResourcePost Create Media Rules
 
 Create media Rules
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiChainsMediaStorageV1MediaRulesPostRequest
+ @param resource Идентификатор ресурсной записи
+ @return ApiChainsMediaStorageV1MediaRulesResourcePostRequest
 */
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPost(ctx context.Context) ApiChainsMediaStorageV1MediaRulesPostRequest {
-	return ApiChainsMediaStorageV1MediaRulesPostRequest{
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourcePost(ctx context.Context, resource string) ApiChainsMediaStorageV1MediaRulesResourcePostRequest {
+	return ApiChainsMediaStorageV1MediaRulesResourcePostRequest{
 		ApiService: a,
 		ctx: ctx,
+		resource: resource,
 	}
 }
 
 // Execute executes the request
 //  @return MediaRules
-func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPostExecute(r ApiChainsMediaStorageV1MediaRulesPostRequest) (*MediaRules, *http.Response, error) {
+func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesResourcePostExecute(r ApiChainsMediaStorageV1MediaRulesResourcePostRequest) (*MediaRules, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -499,12 +515,13 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPostExecute(r ApiCh
 		localVarReturnValue  *MediaRules
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesPost")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MediaRulesAPIService.ChainsMediaStorageV1MediaRulesResourcePost")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/"
+	localVarPath := localBasePath + "/chains/media-storage/v1/media-rules/{resource}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource"+"}", url.PathEscape(parameterValueToString(r.resource, "resource")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -554,8 +571,41 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPostExecute(r ApiCh
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Errors
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v Errors
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v Errors
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
 		if localVarHTTPResponse.StatusCode == 409 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -566,7 +616,7 @@ func (a *MediaRulesAPIService) ChainsMediaStorageV1MediaRulesPostExecute(r ApiCh
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
-			var v Object
+			var v Errors
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

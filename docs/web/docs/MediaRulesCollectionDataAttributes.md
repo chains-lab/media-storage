@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Data** | [**[]MediaData**](MediaData.md) |  | 
+**Data** | [**[]MediaRulesData**](MediaRulesData.md) |  | 
 
 ## Methods
 
 ### NewMediaRulesCollectionDataAttributes
 
-`func NewMediaRulesCollectionDataAttributes(data []MediaData, ) *MediaRulesCollectionDataAttributes`
+`func NewMediaRulesCollectionDataAttributes(data []MediaRulesData, ) *MediaRulesCollectionDataAttributes`
 
 NewMediaRulesCollectionDataAttributes instantiates a new MediaRulesCollectionDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -27,20 +27,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetData
 
-`func (o *MediaRulesCollectionDataAttributes) GetData() []MediaData`
+`func (o *MediaRulesCollectionDataAttributes) GetData() []MediaRulesData`
 
 GetData returns the Data field if non-nil, zero value otherwise.
 
 ### GetDataOk
 
-`func (o *MediaRulesCollectionDataAttributes) GetDataOk() (*[]MediaData, bool)`
+`func (o *MediaRulesCollectionDataAttributes) GetDataOk() (*[]MediaRulesData, bool)`
 
 GetDataOk returns a tuple with the Data field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetData
 
-`func (o *MediaRulesCollectionDataAttributes) SetData(v []MediaData)`
+`func (o *MediaRulesCollectionDataAttributes) SetData(v []MediaRulesData)`
 
 SetData sets Data field to given value.
 

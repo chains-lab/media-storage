@@ -2,30 +2,16 @@ package app
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"mime/multipart"
 	"path/filepath"
-	"time"
 
 	"github.com/chains-lab/gatekit/roles"
-	"github.com/chains-lab/media-storage/internal/repo"
+	"github.com/chains-lab/media-storage/internal/app/ape"
+	"github.com/chains-lab/media-storage/internal/app/domain"
+	"github.com/chains-lab/media-storage/internal/app/models"
 	"github.com/google/uuid"
 )
-
-type MediaModels struct {
-	ID         uuid.UUID
-	Format     string
-	Extension  string
-	Size       int64
-	Url        string
-	Resource   string
-	ResourceID string
-	Category   string
-	OwnerID    uuid.UUID
-	CreatedAt  time.Time
-}
 
 type UploadMediaRequest struct {
 	FileHeader *multipart.FileHeader
@@ -37,94 +23,58 @@ type UploadMediaRequest struct {
 	Category   string
 }
 
-func (a App) UploadMedia(ctx context.Context, request UploadMediaRequest) (MediaModels, error) {
-	createdAt := time.Now().UTC()
-
+func (a App) UploadMedia(ctx context.Context, request UploadMediaRequest) (models.Media, *ape.Error) {
 	ruleID := fmt.Sprintf("%s-%s", request.Resource, request.Category)
 
-	rules, err := a.GetMediaRules(ctx, ruleID)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return MediaModels{}, ErrMediaRulesNotFound
-		default:
-			return MediaModels{}, fmt.Errorf("get media rules in repo %s", err)
-		}
+	rule, appErr := a.rules.Get(ctx, ruleID)
+	if appErr != nil {
+		return models.Media{}, appErr
 	}
 
 	allowedExtension := false
-	for _, ext := range rules.Extensions {
+	for _, ext := range rule.Extensions {
 		if ext == filepath.Ext(request.FileHeader.Filename) {
 			allowedExtension = true
 			break
 		}
 	}
 	if !allowedExtension {
-		return MediaModels{}, ErrMediaExtensionNotAllowed
+		return models.Media{}, ape.ErrorMediaExtensionNotAllowed(fmt.Errorf("extension %s not allowed for resource %s and category %s", filepath.Ext(request.FileHeader.Filename), request.Resource, request.Category))
 	}
 
 	allowedSize := false
-	if request.FileHeader.Size <= rules.MaxSize {
+	if request.FileHeader.Size <= rule.MaxSize {
 		allowedSize = true
 	}
 	if !allowedSize {
-		return MediaModels{}, ErrFileToLarge
+		return models.Media{}, ape.ErrorFileTooLarge(fmt.Errorf("file size %d exceeds allowed size %d", request.FileHeader.Size, rule.MaxSize))
 	}
 
 	allowedRole := false
-	for _, role := range rules.AllowedRoles {
+	for _, role := range rule.AllowedRoles {
 		if role == request.UserRole {
 			allowedRole = true
 			break
 		}
 	}
 	if !allowedRole {
-		return MediaModels{}, ErrUserNotAllowedToUploadMedia
+		return models.Media{}, ape.ErrorUserNotAllowedToUploadMedia(fmt.Errorf("user role %s not allowed to upload media for resource %s and category %s", request.UserRole, request.Resource, request.Category))
 	}
 
-	repoInput := repo.AddMediaInput{
-		Filename:   request.FileHeader.Filename,
+	repoInput := domain.UploadMediaRequest{
+		FileHeader: request.FileHeader,
+		File:       request.File,
+		UserID:     request.UserID,
 		Resource:   request.Resource,
 		ResourceID: request.ResourceID,
 		Category:   request.Category,
-		OwnerID:    request.UserID,
-		CreatedAt:  createdAt,
 	}
 
-	media, err := a.repoMedia.UploadMedia(ctx, request.File, repoInput)
-	if err != nil {
-		switch {
-		default:
-			return MediaModels{}, fmt.Errorf("add media in repo %s", err)
-		}
-	}
-
-	return MediaModels{
-		ID:         media.ID,
-		Format:     media.Format,
-		Extension:  media.Extension,
-		Size:       media.Size,
-		Url:        media.Url,
-		Resource:   media.Resource,
-		ResourceID: media.ResourceID,
-		Category:   media.Category,
-		OwnerID:    media.OwnerID,
-		CreatedAt:  media.CreatedAt,
-	}, nil
+	return a.media.Upload(ctx, repoInput)
 }
 
-func (a App) GetMedia(ctx context.Context, mediaID uuid.UUID) (MediaModels, error) {
-	media, err := a.repoMedia.GetMedia(ctx, mediaID)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return MediaModels{}, ErrMediaNotFound
-		default:
-			return MediaModels{}, fmt.Errorf("get media: %w", err)
-		}
-	}
-
-	return createMediaModel(media), nil
+func (a App) GetMedia(ctx context.Context, mediaID uuid.UUID) (models.Media, *ape.Error) {
+	return a.media.Get(ctx, mediaID)
 }
 
 type DeleteMediaRequest struct {
@@ -133,45 +83,10 @@ type DeleteMediaRequest struct {
 	InitiatorID   uuid.UUID
 }
 
-func (a App) DeleteMedia(ctx context.Context, request DeleteMediaRequest) error {
-	media, err := a.repoMedia.GetMedia(ctx, request.MediaID)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return ErrMediaNotFound
-		default:
-			return fmt.Errorf("get media: %w", err)
-		}
-	}
-
-	if media.OwnerID != request.InitiatorID && roles.CompareRolesUser(request.InitiatorRole, roles.Admin) < 0 {
-		return ErrUserNotAllowedToDeleteMedia
-	}
-
-	err = a.repoMedia.DeleteMedia(ctx, media.ID)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return ErrMediaNotFound
-		default:
-			return fmt.Errorf("delete media: %w", err)
-		}
-	}
-
-	return nil
-}
-
-func createMediaModel(media repo.MediaModel) MediaModels {
-	return MediaModels{
-		ID:         media.ID,
-		Format:     media.Format,
-		Extension:  media.Extension,
-		Size:       media.Size,
-		Url:        media.Url,
-		Resource:   media.Resource,
-		ResourceID: media.ResourceID,
-		Category:   media.Category,
-		OwnerID:    media.OwnerID,
-		CreatedAt:  media.CreatedAt,
-	}
+func (a App) DeleteMedia(ctx context.Context, request DeleteMediaRequest) *ape.Error {
+	return a.media.Delete(ctx, domain.DeleteMediaRequest{
+		MediaID:       request.MediaID,
+		InitiatorRole: request.InitiatorRole,
+		InitiatorID:   request.InitiatorID,
+	})
 }

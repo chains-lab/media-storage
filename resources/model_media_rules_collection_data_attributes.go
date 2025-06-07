@@ -21,7 +21,7 @@ var _ MappedNullable = &MediaRulesCollectionDataAttributes{}
 
 // MediaRulesCollectionDataAttributes struct for MediaRulesCollectionDataAttributes
 type MediaRulesCollectionDataAttributes struct {
-	Data []MediaData `json:"data"`
+	Data []MediaRulesData `json:"data"`
 }
 
 type _MediaRulesCollectionDataAttributes MediaRulesCollectionDataAttributes
@@ -30,7 +30,7 @@ type _MediaRulesCollectionDataAttributes MediaRulesCollectionDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewMediaRulesCollectionDataAttributes(data []MediaData) *MediaRulesCollectionDataAttributes {
+func NewMediaRulesCollectionDataAttributes(data []MediaRulesData) *MediaRulesCollectionDataAttributes {
 	this := MediaRulesCollectionDataAttributes{}
 	this.Data = data
 	return &this
@@ -45,9 +45,9 @@ func NewMediaRulesCollectionDataAttributesWithDefaults() *MediaRulesCollectionDa
 }
 
 // GetData returns the Data field value
-func (o *MediaRulesCollectionDataAttributes) GetData() []MediaData {
+func (o *MediaRulesCollectionDataAttributes) GetData() []MediaRulesData {
 	if o == nil {
-		var ret []MediaData
+		var ret []MediaRulesData
 		return ret
 	}
 
@@ -56,7 +56,7 @@ func (o *MediaRulesCollectionDataAttributes) GetData() []MediaData {
 
 // GetDataOk returns a tuple with the Data field value
 // and a boolean to check if the value has been set.
-func (o *MediaRulesCollectionDataAttributes) GetDataOk() ([]MediaData, bool) {
+func (o *MediaRulesCollectionDataAttributes) GetDataOk() ([]MediaRulesData, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -64,7 +64,7 @@ func (o *MediaRulesCollectionDataAttributes) GetDataOk() ([]MediaData, bool) {
 }
 
 // SetData sets field value
-func (o *MediaRulesCollectionDataAttributes) SetData(v []MediaData) {
+func (o *MediaRulesCollectionDataAttributes) SetData(v []MediaRulesData) {
 	o.Data = v
 }
 

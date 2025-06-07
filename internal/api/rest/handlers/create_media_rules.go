@@ -6,29 +6,21 @@ import (
 	"github.com/chains-lab/gatekit/httpkit"
 	"github.com/chains-lab/gatekit/roles"
 	"github.com/chains-lab/gatekit/tokens"
-	"github.com/chains-lab/media-storage/internal/api/rest/ape"
 	"github.com/chains-lab/media-storage/internal/api/rest/requests"
 	"github.com/chains-lab/media-storage/internal/api/rest/responses"
 	"github.com/chains-lab/media-storage/internal/app"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
-const CreateMediaRylesHandlerName = "CreateMediaRulesHandler"
+const CreateMediaRulesHandlerName = "CreateMediaRulesHandler"
 
 func (h Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 	requestID := uuid.New()
-	log := h.log.WithFields(logrus.Fields{
-		"handler":    CreateMediaRylesHandlerName,
-		"request_id": requestID.String(),
-	})
 
-	user, err := tokens.GetAccountTokenData(r.Context())
+	user, err := tokens.GetUserTokenData(r.Context())
 	if err != nil {
-		ape.BadRequest(w, requestID, "Error getting token data")
-		log.WithError(err).Errorf("Error getting token data")
-		
+		h.presenter.InvalidToken(w, requestID, err)
 		return
 	}
 
@@ -36,41 +28,33 @@ func (h Handler) CreateMediaRules(w http.ResponseWriter, r *http.Request) {
 
 	req, err := requests.CreateMediaRules(r)
 	if err != nil {
-		ape.BadRequest(w, requestID, err.Error())
-		log.WithError(err).Errorf("Error parsing request body")
-
+		h.presenter.InvalidPointer(w, requestID, err)
 		return
 	}
 
 	if resource != req.Data.Id {
-		ape.BadRequest(w, requestID, "Resource ID does not match the request ID")
-		log.Errorf("Resource ID %s does not match the request ID %s", resource, req.Data.Id)
-
+		h.presenter.MismatchIdentification(w, requestID, "resource", req.Data.Id)
 		return
 	}
 
 	rolesInReq, err := parseRoles(req.Data.Attributes.Roles)
 	if err != nil {
-		ape.BadRequest(w, requestID, "Error parsing roles")
-		log.WithError(err).Errorf("Error parsing roles")
-
+		h.presenter.InvalidPointer(w, requestID, err)
 		return
 	}
 
-	res, err := h.app.CreateMediaRules(r.Context(), app.CreateMediaRulesRequest{
+	res, appErr := h.app.CreateMediaRules(r.Context(), app.CreateMediaRulesRequest{
 		ID:         req.Data.Id,
 		Extensions: req.Data.Attributes.Extensions,
 		MaxSize:    req.Data.Attributes.MaxSize,
 		Roles:      rolesInReq,
 	})
-	if err != nil {
-		ape.ApplicationError(w, requestID, err)
-		log.WithError(err).Errorf("Error creating media rules")
-
+	if appErr != nil {
+		h.presenter.AppError(w, requestID, appErr)
 		return
 	}
 
-	log.Infof("Created media rules %s by user: %s", req.Data.Id, user.AccountID)
+	h.log.WithField("request_id", requestID).Infof("Created media rules %s by user: %s", req.Data.Id, user.UserID)
 	httpkit.Render(w, responses.MediaRules(res))
 }
 
