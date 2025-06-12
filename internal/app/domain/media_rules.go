@@ -2,183 +2,81 @@ package domain
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"fmt"
-	"strings"
-	"time"
 
-	"github.com/chains-lab/gatekit/roles"
-	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/chains-lab/media-storage/internal/app/models"
+	"github.com/chains-lab/media-storage/internal/aws"
 	"github.com/chains-lab/media-storage/internal/config"
 	"github.com/chains-lab/media-storage/internal/repo"
+	"github.com/chains-lab/media-storage/internal/repo/sqldb"
 )
 
 type mediaRulesRepo interface {
-	Create(ctx context.Context, input repo.CreateMediaRulesInput) (repo.MediaRulesModel, error)
-	Get(ctx context.Context, id string) (repo.MediaRulesModel, error)
-	Update(ctx context.Context, id string, input repo.MediaRulesUpdateInput) error
-	Delete(ctx context.Context, id string) error
+	GetByResourceAndCategory(ctx context.Context, resource, category string) (sqldb.MediaRulesModel, error)
 }
 
-func NewMediaRules(cfg config.Config) (MediaRules, error) {
-	rulesRepo, err := repo.NewMediaRulesRepo(cfg)
+type MediaAllowedExtensionRepo interface {
+	GetByResourcesAndCategory(ctx context.Context, resource, category string) ([]sqldb.AllowedExtensionModel, error)
+}
+
+type awsS3 interface {
+	GeneratePutURL(ctx context.Context, folder, originalFilename, contentType string) (*aws.MediaURL, error)
+	GenerateGetURL(ctx context.Context, key string) (string, error)
+}
+type MediaRules struct {
+	rules      mediaRulesRepo
+	extensions MediaAllowedExtensionRepo
+	s3         awsS3
+}
+
+func NewMediaRules(cfg config.Config) MediaRules {
+	rulesRepo, err := repo.NewMediaRules(cfg)
 	if err != nil {
-		return MediaRules{}, err
+		panic(err)
+	}
+
+	extensionsRepo, err := repo.NewAllowedExtension(cfg)
+	if err != nil {
+		panic(err)
 	}
 
 	return MediaRules{
-		repo: rulesRepo,
+		rules:      rulesRepo,
+		extensions: extensionsRepo,
+	}
+
+}
+
+func (m MediaRules) GetMediaRules(ctx context.Context, resource, category string) (models.MediaRules, error) {
+	mediaRules, err := m.rules.GetByResourceAndCategory(ctx, resource, category)
+	if err != nil {
+		return models.MediaRules{}, err
+	}
+
+	allowedExt, err := m.extensions.GetByResourcesAndCategory(ctx, resource, category)
+	if err != nil {
+		return models.MediaRules{}, err
+	}
+
+	extensions := make([]models.AllowedExtensionModel, 0, len(allowedExt))
+	for _, ext := range allowedExt {
+		extensions = append(extensions, models.AllowedExtensionModel{
+			Extension: ext.Extension,
+			MaxSize:   ext.MaxSize,
+		})
+	}
+
+	return models.MediaRules{
+		Resource:   mediaRules.Resource,
+		Category:   mediaRules.Category,
+		Extensions: extensions,
 	}, nil
 }
 
-type MediaRules struct {
-	repo mediaRulesRepo
-}
-
-func (r MediaRules) Get(ctx context.Context, ID string) (models.MediaRules, *ape.Error) {
-	rules, err := r.repo.Get(ctx, ID)
+func (m MediaRules) GenerateMediaPutURL(ctx context.Context, folder, originalFilename, contentType string) (*aws.MediaURL, error) {
+	putURL, err := m.s3.GeneratePutURL(ctx, folder, originalFilename, contentType)
 	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return models.MediaRules{}, ape.ErrorMediaRulesNotFound(err)
-		default:
-			return models.MediaRules{}, ape.ErrorInternal(err)
-		}
+		return nil, err
 	}
 
-	return createMediaRulesModel(rules), nil
-}
-
-type CreateMediaRulesRequest struct {
-	ID         string
-	Extensions []string
-	MaxSize    int64
-	Roles      []roles.Role
-}
-
-func (r MediaRules) Create(ctx context.Context, request CreateMediaRulesRequest) (models.MediaRules, *ape.Error) {
-	now := time.Now().UTC()
-
-	_, appErr := r.Get(context.TODO(), request.ID)
-	if appErr != nil {
-		return models.MediaRules{}, appErr
-	}
-
-	repoInput := repo.CreateMediaRulesInput{
-		ID:           request.ID,
-		Extensions:   request.Extensions,
-		MaxSize:      request.MaxSize,
-		AllowedRoles: request.Roles,
-		UpdatedAt:    now,
-		CreatedAt:    now,
-	}
-
-	res, err := r.repo.Create(ctx, repoInput)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return models.MediaRules{}, ape.ErrorMediaRulesAlreadyExists(err)
-		default:
-			return models.MediaRules{}, ape.ErrorInternal(err)
-		}
-	}
-
-	return createMediaRulesModel(res), nil
-}
-
-type UpdateMediaRulesRequest struct {
-	Extensions   *[]string     `db:"extensions"`
-	MaxSize      *int64        `db:"max_size"`
-	AllowedRoles *[]roles.Role `db:"allowed_roles"`
-}
-
-func (r MediaRules) Update(ctx context.Context, ID string, request UpdateMediaRulesRequest) (models.MediaRules, *ape.Error) {
-	_, appErr := r.Get(ctx, ID)
-	if appErr != nil {
-		return models.MediaRules{}, appErr
-	}
-
-	now := time.Now().UTC()
-	updated := false
-
-	var repoInput repo.MediaRulesUpdateInput
-	if request.Extensions != nil {
-		repoInput.Extensions = request.Extensions
-		updated = true
-	}
-	if request.MaxSize != nil {
-		repoInput.MaxSize = request.MaxSize
-		updated = true
-	}
-	if request.AllowedRoles != nil {
-		repoInput.AllowedRoles = request.AllowedRoles
-		updated = true
-	}
-	repoInput.UpdatedAt = now
-
-	//for idempotency
-	if !updated {
-		return r.Get(ctx, ID)
-	}
-
-	err := r.repo.Update(ctx, ID, repoInput)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return models.MediaRules{}, ape.ErrorMediaRulesNotFound(err)
-		default:
-			return models.MediaRules{}, ape.ErrorInternal(err)
-		}
-	}
-
-	return r.Get(ctx, ID)
-}
-
-func (r MediaRules) Delete(ctx context.Context, ID string) *ape.Error {
-	_, appErr := r.Get(ctx, ID)
-	if appErr != nil {
-		return appErr
-	}
-
-	arr := strings.Split(ID, "-")
-	if len(arr) != 2 {
-		return ape.ErrorInvalidRequestQuery(fmt.Errorf("invalid media rules ID format: %s", ID))
-	}
-	//resource := arr[0]
-	//category := arr[1]
-
-	//err := r.repo.DeleteFilesByResourceAndCategory(ctx, resource, category)
-	//if err != nil {
-	//	switch {
-	//	case errors.Is(err, sql.ErrNoRows):
-	//		return ErrMediaNotFound
-	//	default:
-	//		return fmt.Errorf("delete media: %w", err)
-	//	}
-	//}
-
-	err := r.repo.Delete(ctx, ID)
-	if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			return ape.ErrorMediaRulesNotFound(err)
-		default:
-			return ape.ErrorInternal(err)
-		}
-	}
-
-	return nil
-}
-
-func createMediaRulesModel(mediaRules repo.MediaRulesModel) models.MediaRules {
-	return models.MediaRules{
-		ID:           mediaRules.ID,
-		Extensions:   mediaRules.Extensions,
-		MaxSize:      mediaRules.MaxSize,
-		AllowedRoles: mediaRules.AllowedRoles,
-		UpdatedAt:    mediaRules.UpdatedAt,
-		CreatedAt:    mediaRules.CreatedAt,
-	}
+	return putURL, nil
 }
