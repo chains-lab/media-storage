@@ -7,13 +7,12 @@ Name | Type | Description | Notes
 **Resource** | **string** | media resource | 
 **ResourceId** | **string** | media resource ID | 
 **Category** | **string** | media category | 
-**OwnerId** | **string** | media owner ID | 
 
 ## Methods
 
 ### NewUploadMediaDataAttributes
 
-`func NewUploadMediaDataAttributes(resource string, resourceId string, category string, ownerId string, ) *UploadMediaDataAttributes`
+`func NewUploadMediaDataAttributes(resource string, resourceId string, category string, ) *UploadMediaDataAttributes`
 
 NewUploadMediaDataAttributes instantiates a new UploadMediaDataAttributes object
 This constructor will assign default values to properties that have it defined,
@@ -86,26 +85,6 @@ and a boolean to check if the value has been set.
 `func (o *UploadMediaDataAttributes) SetCategory(v string)`
 
 SetCategory sets Category field to given value.
-
-
-### GetOwnerId
-
-`func (o *UploadMediaDataAttributes) GetOwnerId() string`
-
-GetOwnerId returns the OwnerId field if non-nil, zero value otherwise.
-
-### GetOwnerIdOk
-
-`func (o *UploadMediaDataAttributes) GetOwnerIdOk() (*string, bool)`
-
-GetOwnerIdOk returns a tuple with the OwnerId field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetOwnerId
-
-`func (o *UploadMediaDataAttributes) SetOwnerId(v string)`
-
-SetOwnerId sets OwnerId field to given value.
 
 
 

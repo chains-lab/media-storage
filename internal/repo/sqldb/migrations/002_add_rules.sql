@@ -1,0 +1,5 @@
+-- INSERT INTO media_rules(resource, category, extensions, max_size)
+-- VALUES
+--     ('article', 'video', ARRAY['.mp4','.webm'], 100*1024*1024),
+--     ('article', 'image', ARRAY['.png','.jpg','.jpeg'], 5*1024*1024),
+--     ('article', 'audio', ARRAY['.mp3','.wav'], 10*1024*1024),

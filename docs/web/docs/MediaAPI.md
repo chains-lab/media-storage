@@ -98,7 +98,7 @@ import (
 )
 
 func main() {
-	uploadMedia := *openapiclient.NewUploadMedia(*openapiclient.NewUploadMediaData("Type_example", *openapiclient.NewUploadMediaDataAttributes("Resource_example", "ResourceId_example", "Category_example", "OwnerId_example"))) // UploadMedia | 
+	uploadMedia := *openapiclient.NewUploadMedia(*openapiclient.NewUploadMediaData("Type_example", *openapiclient.NewUploadMediaDataAttributes("Resource_example", "ResourceId_example", "Category_example"))) // UploadMedia | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)

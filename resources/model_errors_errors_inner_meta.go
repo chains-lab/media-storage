@@ -22,8 +22,14 @@ var _ MappedNullable = &ErrorsErrorsInnerMeta{}
 
 // ErrorsErrorsInnerMeta struct for ErrorsErrorsInnerMeta
 type ErrorsErrorsInnerMeta struct {
+	// Error ID is a unique identifier for the error, used for debugging and tracing
+	ErrorId string `json:"error_id"`
 	// Request ID is a unique identifier for the request, used for debugging and tracing
 	RequestId string `json:"request_id"`
+	// Parameter is the name of the request parameter that caused the error, if applicable
+	Parameter *string `json:"parameter,omitempty"`
+	// Pointer is a JSON Pointer that identifies the part of the request document that caused the error, if applicable
+	Pointer *string `json:"pointer,omitempty"`
 	// Timestamp is the time when the error occurred, in ISO 8601 format
 	Timestamp time.Time `json:"timestamp"`
 }
@@ -34,8 +40,9 @@ type _ErrorsErrorsInnerMeta ErrorsErrorsInnerMeta
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewErrorsErrorsInnerMeta(requestId string, timestamp time.Time) *ErrorsErrorsInnerMeta {
+func NewErrorsErrorsInnerMeta(errorId string, requestId string, timestamp time.Time) *ErrorsErrorsInnerMeta {
 	this := ErrorsErrorsInnerMeta{}
+	this.ErrorId = errorId
 	this.RequestId = requestId
 	this.Timestamp = timestamp
 	return &this
@@ -47,6 +54,30 @@ func NewErrorsErrorsInnerMeta(requestId string, timestamp time.Time) *ErrorsErro
 func NewErrorsErrorsInnerMetaWithDefaults() *ErrorsErrorsInnerMeta {
 	this := ErrorsErrorsInnerMeta{}
 	return &this
+}
+
+// GetErrorId returns the ErrorId field value
+func (o *ErrorsErrorsInnerMeta) GetErrorId() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.ErrorId
+}
+
+// GetErrorIdOk returns a tuple with the ErrorId field value
+// and a boolean to check if the value has been set.
+func (o *ErrorsErrorsInnerMeta) GetErrorIdOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.ErrorId, true
+}
+
+// SetErrorId sets field value
+func (o *ErrorsErrorsInnerMeta) SetErrorId(v string) {
+	o.ErrorId = v
 }
 
 // GetRequestId returns the RequestId field value
@@ -71,6 +102,70 @@ func (o *ErrorsErrorsInnerMeta) GetRequestIdOk() (*string, bool) {
 // SetRequestId sets field value
 func (o *ErrorsErrorsInnerMeta) SetRequestId(v string) {
 	o.RequestId = v
+}
+
+// GetParameter returns the Parameter field value if set, zero value otherwise.
+func (o *ErrorsErrorsInnerMeta) GetParameter() string {
+	if o == nil || IsNil(o.Parameter) {
+		var ret string
+		return ret
+	}
+	return *o.Parameter
+}
+
+// GetParameterOk returns a tuple with the Parameter field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ErrorsErrorsInnerMeta) GetParameterOk() (*string, bool) {
+	if o == nil || IsNil(o.Parameter) {
+		return nil, false
+	}
+	return o.Parameter, true
+}
+
+// HasParameter returns a boolean if a field has been set.
+func (o *ErrorsErrorsInnerMeta) HasParameter() bool {
+	if o != nil && !IsNil(o.Parameter) {
+		return true
+	}
+
+	return false
+}
+
+// SetParameter gets a reference to the given string and assigns it to the Parameter field.
+func (o *ErrorsErrorsInnerMeta) SetParameter(v string) {
+	o.Parameter = &v
+}
+
+// GetPointer returns the Pointer field value if set, zero value otherwise.
+func (o *ErrorsErrorsInnerMeta) GetPointer() string {
+	if o == nil || IsNil(o.Pointer) {
+		var ret string
+		return ret
+	}
+	return *o.Pointer
+}
+
+// GetPointerOk returns a tuple with the Pointer field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ErrorsErrorsInnerMeta) GetPointerOk() (*string, bool) {
+	if o == nil || IsNil(o.Pointer) {
+		return nil, false
+	}
+	return o.Pointer, true
+}
+
+// HasPointer returns a boolean if a field has been set.
+func (o *ErrorsErrorsInnerMeta) HasPointer() bool {
+	if o != nil && !IsNil(o.Pointer) {
+		return true
+	}
+
+	return false
+}
+
+// SetPointer gets a reference to the given string and assigns it to the Pointer field.
+func (o *ErrorsErrorsInnerMeta) SetPointer(v string) {
+	o.Pointer = &v
 }
 
 // GetTimestamp returns the Timestamp field value
@@ -107,7 +202,14 @@ func (o ErrorsErrorsInnerMeta) MarshalJSON() ([]byte, error) {
 
 func (o ErrorsErrorsInnerMeta) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["error_id"] = o.ErrorId
 	toSerialize["request_id"] = o.RequestId
+	if !IsNil(o.Parameter) {
+		toSerialize["parameter"] = o.Parameter
+	}
+	if !IsNil(o.Pointer) {
+		toSerialize["pointer"] = o.Pointer
+	}
 	toSerialize["timestamp"] = o.Timestamp
 	return toSerialize, nil
 }
@@ -117,6 +219,7 @@ func (o *ErrorsErrorsInnerMeta) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"error_id",
 		"request_id",
 		"timestamp",
 	}

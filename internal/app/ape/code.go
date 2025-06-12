@@ -12,14 +12,14 @@ const (
 
 	//Specific error codes
 
-	CodeMediaRulesNotFound          = "MEDIA_RULES_NOT_FOUND"
-	CodeMediaRulesAlreadyExists     = "MEDIA_RULES_ALREADY_EXISTS"
-	CodeFileTooLarge                = "FILE_TOO_LARGE"
-	CodeFileFormatNotAllowed        = "FILE_FORMAT_NOT_ALLOWED"
-	CodeUserNotAllowedToUploadMedia = "USER_NOT_ALLOWED_TO_UPLOAD_MEDIA"
-	CodeUserNotAllowedToDeleteMedia = "USER_NOT_ALLOWED_TO_DELETE_MEDIA"
-	CodeMediaNotFound               = "MEDIA_DOES_NOT_FOUND"
-	CodeMediaAlreadyExists          = "MEDIA_ALREADY_EXISTS"
-	CodeInvalidMediaId              = "INVALID_MEDIA_ID"
-	CodeMediaExtensionNotAllowed    = "MEDIA_EXTENSION_NOT_ALLOWED"
+	CodeMediaRulesNotFound       = "MEDIA_RULES_NOT_FOUND"
+	CodeFileTooLarge             = "FILE_TOO_LARGE"
+	CodeMediaExtensionNotAllowed = "MEDIA_EXTENSION_NOT_ALLOWED"
+
+	//CodeFileFormatNotAllowed        = "FILE_FORMAT_NOT_ALLOWED"
+	//CodeUserNotAllowedToUploadMedia = "USER_NOT_ALLOWED_TO_UPLOAD_MEDIA"
+	//CodeUserNotAllowedToDeleteMedia = "USER_NOT_ALLOWED_TO_DELETE_MEDIA"
+	//CodeMediaNotFound               = "MEDIA_DOES_NOT_FOUND"
+	//CodeMediaAlreadyExists          = "MEDIA_ALREADY_EXISTS"
+	//CodeInvalidMediaId              = "INVALID_MEDIA_ID"
 )

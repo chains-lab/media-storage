@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/chains-lab/gatekit/httpkit"
-	"github.com/chains-lab/media-storage/internal/api/rest/requests"
-	"github.com/chains-lab/media-storage/internal/api/rest/responses"
 	"github.com/chains-lab/media-storage/internal/app"
+	"github.com/chains-lab/media-storage/internal/rest/requests"
+	"github.com/chains-lab/media-storage/internal/rest/responses"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )

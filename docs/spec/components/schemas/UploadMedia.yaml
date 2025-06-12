@@ -17,7 +17,6 @@ properties:
           - resource
           - resource_id
           - category
-          - owner_id
         properties:
           resource:
             type: string
@@ -28,6 +27,3 @@ properties:
           category:
             type: string
             description: "media category"
-          owner_id:
-            type: string
-            description: "media owner ID"

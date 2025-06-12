@@ -405,7 +405,6 @@ components:
       required:
       - data
     Errors:
-      description: Standard JSON:API error
       properties:
         errors:
           description: Non empty array of errors occurred during request processing
@@ -444,12 +443,8 @@ components:
         category:
           description: media category
           type: string
-        owner_id:
-          description: media owner ID
-          type: string
       required:
       - category
-      - owner_id
       - resource
       - resource_id
     UploadMedia_data:
@@ -550,10 +545,25 @@ components:
       - type
     Errors_errors_inner_meta:
       properties:
+        error_id:
+          description: "Error ID is a unique identifier for the error, used for debugging\
+            \ and tracing"
+          example: 0987654321fedcba
+          type: string
         request_id:
           description: "Request ID is a unique identifier for the request, used for\
             \ debugging and tracing"
           example: 1234567890abcdef
+          type: string
+        parameter:
+          description: "Parameter is the name of the request parameter that caused\
+            \ the error, if applicable"
+          example: email
+          type: string
+        pointer:
+          description: "Pointer is a JSON Pointer that identifies the part of the\
+            \ request document that caused the error, if applicable"
+          example: /data/attributes/email
           type: string
         timestamp:
           description: "Timestamp is the time when the error occurred, in ISO 8601\
@@ -562,6 +572,7 @@ components:
           format: date-time
           type: string
       required:
+      - error_id
       - request_id
       - timestamp
     Errors_errors_inner:
@@ -573,7 +584,11 @@ components:
           - 401
           - 403
           - 404
+          - 405
+          - 408
           - 409
+          - 415
+          - 429
           - 500
           example: 400
           type: integer

@@ -28,22 +28,21 @@ type MediaRules struct {
 	s3         awsS3
 }
 
-func NewMediaRules(cfg config.Config) MediaRules {
+func NewMediaRules(cfg config.Config) (MediaRules, error) {
 	rulesRepo, err := repo.NewMediaRules(cfg)
 	if err != nil {
-		panic(err)
+		return MediaRules{}, err
 	}
 
 	extensionsRepo, err := repo.NewAllowedExtension(cfg)
 	if err != nil {
-		panic(err)
+		return MediaRules{}, err
 	}
 
 	return MediaRules{
 		rules:      rulesRepo,
 		extensions: extensionsRepo,
-	}
-
+	}, nil
 }
 
 func (m MediaRules) GetMediaRules(ctx context.Context, resource, category string) (models.MediaRules, error) {

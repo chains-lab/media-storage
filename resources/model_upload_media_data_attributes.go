@@ -27,8 +27,6 @@ type UploadMediaDataAttributes struct {
 	ResourceId string `json:"resource_id"`
 	// media category
 	Category string `json:"category"`
-	// media owner ID
-	OwnerId string `json:"owner_id"`
 }
 
 type _UploadMediaDataAttributes UploadMediaDataAttributes
@@ -37,12 +35,11 @@ type _UploadMediaDataAttributes UploadMediaDataAttributes
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUploadMediaDataAttributes(resource string, resourceId string, category string, ownerId string) *UploadMediaDataAttributes {
+func NewUploadMediaDataAttributes(resource string, resourceId string, category string) *UploadMediaDataAttributes {
 	this := UploadMediaDataAttributes{}
 	this.Resource = resource
 	this.ResourceId = resourceId
 	this.Category = category
-	this.OwnerId = ownerId
 	return &this
 }
 
@@ -126,30 +123,6 @@ func (o *UploadMediaDataAttributes) SetCategory(v string) {
 	o.Category = v
 }
 
-// GetOwnerId returns the OwnerId field value
-func (o *UploadMediaDataAttributes) GetOwnerId() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.OwnerId
-}
-
-// GetOwnerIdOk returns a tuple with the OwnerId field value
-// and a boolean to check if the value has been set.
-func (o *UploadMediaDataAttributes) GetOwnerIdOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.OwnerId, true
-}
-
-// SetOwnerId sets field value
-func (o *UploadMediaDataAttributes) SetOwnerId(v string) {
-	o.OwnerId = v
-}
-
 func (o UploadMediaDataAttributes) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -163,7 +136,6 @@ func (o UploadMediaDataAttributes) ToMap() (map[string]interface{}, error) {
 	toSerialize["resource"] = o.Resource
 	toSerialize["resource_id"] = o.ResourceId
 	toSerialize["category"] = o.Category
-	toSerialize["owner_id"] = o.OwnerId
 	return toSerialize, nil
 }
 
@@ -175,7 +147,6 @@ func (o *UploadMediaDataAttributes) UnmarshalJSON(data []byte) (err error) {
 		"resource",
 		"resource_id",
 		"category",
-		"owner_id",
 	}
 
 	allProperties := make(map[string]interface{})

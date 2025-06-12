@@ -1,16 +1,12 @@
 package models
 
-import (
-	"time"
-
-	"github.com/chains-lab/gatekit/roles"
-)
+type AllowedExtensionModel struct {
+	Extension string `db:"extension"`
+	MaxSize   int64  `db:"max_size"`
+}
 
 type MediaRules struct {
-	ID           string
-	Extensions   []string
-	MaxSize      int64
-	AllowedRoles []roles.Role
-	UpdatedAt    time.Time
-	CreatedAt    time.Time
+	Resource   string
+	Category   string
+	Extensions []AllowedExtensionModel
 }

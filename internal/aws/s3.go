@@ -53,12 +53,10 @@ func NewS3PresignClient(bucket, region, accessKeyID, secretAccessKey string, def
 
 // GeneratePutURL returns a presigned PUT URL for uploading a file
 func (s *S3Client) GeneratePutURL(ctx context.Context, folder, originalFilename, contentType string) (*MediaURL, error) {
-	// Extract extension and generate unique filename
 	ext := path.Ext(originalFilename)
 	id := uuid.New().String()
 	key := path.Join(folder, id+ext)
 
-	// Prepare presign parameters
 	input := &s3.PutObjectInput{
 		Bucket:      aws.String(s.bucket),
 		Key:         aws.String(key),

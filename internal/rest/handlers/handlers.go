@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/chains-lab/media-storage/internal/api/rest/presenter"
 	"github.com/chains-lab/media-storage/internal/app"
 	"github.com/chains-lab/media-storage/internal/app/ape"
 	"github.com/chains-lab/media-storage/internal/app/models"
 	"github.com/chains-lab/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/rest/presenter"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )

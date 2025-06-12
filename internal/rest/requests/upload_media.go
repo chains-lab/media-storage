@@ -43,12 +43,11 @@ func UploadMedia(r *http.Request) (req resources.UploadMedia, file multipart.Fil
 
 	// валидация полей JSONAPI
 	errs := validation.Errors{
-		"data/type":       validation.Validate(req.Data.Type, validation.Required, validation.In(resources.MediaUploadType)),
-		"data/attributes": validation.Validate(req.Data.Attributes, validation.Required),
-		"data/attributes/resource": validation.Validate(req.Data.Attributes.Resource, validation.Required),
+		"data/type":                   validation.Validate(req.Data.Type, validation.Required, validation.In(resources.MediaUploadType)),
+		"data/attributes":             validation.Validate(req.Data.Attributes, validation.Required),
+		"data/attributes/resource":    validation.Validate(req.Data.Attributes.Resource, validation.Required),
 		"data/attributes/resource_id": validation.Validate(req.Data.Attributes.ResourceId, validation.Required),
-		"data/attributes/category": validation.Validate(req.Data.Attributes.Category, validation.Required),
-		"data/attributes/owner_id": validation.Validate(req.Data.Attributes.OwnerId, validation.Required),
+		"data/attributes/category":    validation.Validate(req.Data.Attributes.Category, validation.Required),
 	}
 	if err = errs.Filter(); err != nil {
 		return

@@ -11,6 +11,7 @@ import (
 	"github.com/alecthomas/kingpin"
 	"github.com/chains-lab/media-storage/internal/app"
 	"github.com/chains-lab/media-storage/internal/config"
+	"github.com/chains-lab/media-storage/internal/migrator"
 )
 
 func Run(args []string) bool {
@@ -23,9 +24,12 @@ func Run(args []string) bool {
 	logger.Info("Starting server...")
 
 	var (
-		service    = kingpin.New("news-radar", "")
-		runCmd     = service.Command("run", "run command")
-		serviceCmd = runCmd.Command("service", "run service")
+		service        = kingpin.New("news-radar", "")
+		runCmd         = service.Command("run", "run command")
+		serviceCmd     = runCmd.Command("service", "run service")
+		migrateCmd     = service.Command("migrate", "migrate command")
+		migrateUpCmd   = migrateCmd.Command("up", "migrate db up")
+		migrateDownCmd = migrateCmd.Command("down", "migrate db down")
 	)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -48,6 +52,10 @@ func Run(args []string) bool {
 	switch cmd {
 	case serviceCmd.FullCommand():
 		runServices(ctx, cfg, logger, &wg, &application)
+	case migrateUpCmd.FullCommand():
+		err = migrator.RunUp(cfg)
+	case migrateDownCmd.FullCommand():
+		err = migrator.RunDown(cfg)
 	default:
 		logger.Errorf("unknown command %s", cmd)
 		return false
